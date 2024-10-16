@@ -5,6 +5,7 @@ namespace MovieHub.Application.Models;
 public class GenreLookup
 {
     private string _name;
+    
     public int Id { get; init; }
 
     [Required]

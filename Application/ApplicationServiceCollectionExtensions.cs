@@ -27,4 +27,5 @@ public static class ApplicationServiceCollectionExtensions
         services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
         return services;
     }
+    
 }

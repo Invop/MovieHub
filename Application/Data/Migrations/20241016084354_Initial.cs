@@ -48,17 +48,11 @@ namespace MovieHub.Application.Data.Migrations
                 columns: table => new
                 {
                     movieid = table.Column<Guid>(type: "uuid", nullable: false),
-                    genreid = table.Column<int>(type: "integer", nullable: false),
-                    GenreLookupId = table.Column<int>(type: "integer", nullable: true)
+                    genreid = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_movie_genres", x => new { x.movieid, x.genreid });
-                    table.ForeignKey(
-                        name: "FK_movie_genres_genres_GenreLookupId",
-                        column: x => x.GenreLookupId,
-                        principalTable: "genres",
-                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_movie_genres_genres_genreid",
                         column: x => x.genreid,
@@ -96,11 +90,6 @@ namespace MovieHub.Application.Data.Migrations
                 name: "IX_movie_genres_genreid",
                 table: "movie_genres",
                 column: "genreid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_movie_genres_GenreLookupId",
-                table: "movie_genres",
-                column: "GenreLookupId");
 
             migrationBuilder.CreateIndex(
                 name: "movies_slug_idx",

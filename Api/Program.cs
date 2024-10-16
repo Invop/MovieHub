@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Microsoft.EntityFrameworkCore;
 using MovieHub.Api.Mapping;
 using MovieHub.Application;
 using MovieHub.Application.Data;
@@ -38,6 +39,10 @@ app.UseOutputCache();
 
 app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapControllers();
-
-
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<MovieHubDbContext>();
+    dbContext.Database.Migrate();
+    await MoviesInitializer.Seed(dbContext, "movies.json");
+}
 app.Run();

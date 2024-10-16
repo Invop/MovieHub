@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MovieHub.Application.Data.Migrations
 {
     [DbContext(typeof(MovieHubDbContext))]
-    [Migration("20241016072849_Initial")]
+    [Migration("20241016084354_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -35,14 +35,9 @@ namespace MovieHub.Application.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("genreid");
 
-                    b.Property<int?>("GenreLookupId")
-                        .HasColumnType("integer");
-
                     b.HasKey("MovieId", "GenreId");
 
                     b.HasIndex("GenreId");
-
-                    b.HasIndex("GenreLookupId");
 
                     b.ToTable("movie_genres", (string)null);
                 });
@@ -137,14 +132,10 @@ namespace MovieHub.Application.Data.Migrations
             modelBuilder.Entity("MovieHub.Application.Models.Genre", b =>
                 {
                     b.HasOne("MovieHub.Application.Models.GenreLookup", "GenreLookup")
-                        .WithMany()
+                        .WithMany("Genres")
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("MovieHub.Application.Models.GenreLookup", null)
-                        .WithMany("Genres")
-                        .HasForeignKey("GenreLookupId");
 
                     b.HasOne("MovieHub.Application.Models.Movie", "Movie")
                         .WithMany("Genres")
