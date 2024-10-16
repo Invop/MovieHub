@@ -77,7 +77,14 @@ builder.Services.AddSwaggerGen(x => x.OperationFilter<SwaggerDefaultValues>());
 
 builder.Services.AddDatabase(config["Database:ConnectionString"]!);
 builder.Services.AddApplication();
-
+builder.Services.AddCors(options => 
+{
+    options.AddPolicy("CorsPolicy", builder => 
+        builder.WithOrigins("https://localhost:5005")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
@@ -93,7 +100,7 @@ if (app.Environment.IsDevelopment())
 }
 app.MapHealthChecks("_health");
 app.UseHttpsRedirection();
-
+app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
