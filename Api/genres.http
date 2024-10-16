@@ -1,0 +1,37 @@
+# Create a new genre
+POST https://localhost:7287/api/genres?api-version=1.0
+Content-Type: application/json
+
+{
+  "Name": "Action"
+}
+
+###
+
+# Get genre by ID or Name (example with ID: 1)
+GET https://localhost:7287/api/genres/1?api-version=1.0
+
+###
+
+# Get genre by Name (example with Name: Action)
+GET https://localhost:7287/api/genres/Action?api-version=1.0
+
+###
+
+# Get all genres
+GET https://localhost:7287/api/genres?api-version=1.0
+
+###
+
+# Update a genre (assuming ID is 1)
+PUT https://localhost:7287/api/genres/1?api-version=1.0
+Content-Type: application/json
+
+{
+  "NewName": "Action & Adventure"
+}
+
+###
+
+# Delete a genre (assuming ID is 1)
+DELETE https://localhost:7287/api/genres/1?api-version=1.0
