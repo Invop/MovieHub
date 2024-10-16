@@ -6,6 +6,7 @@ using MovieHub.Contracts.Requests;
 using MovieHub.Contracts.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MovieHub.Api.Auth;
 using MovieHub.Application.Models;
 
 namespace MovieHub.Api.Controllers;
@@ -15,18 +16,16 @@ namespace MovieHub.Api.Controllers;
 public class GenresController : ControllerBase
 {
     private readonly IGenreService _genreService;
-    private readonly IIdentityService _identityService;
     private readonly ILogger<GenresController> _logger;
 
-    public GenresController(IGenreService genreService, IIdentityService identityService,
+    public GenresController(IGenreService genreService,
         ILogger<GenresController> logger)
     {
         _genreService = genreService;
-        _identityService = identityService;
         _logger = logger;
     }
 
-    [Authorize(Roles = "admin,trusted_member")]
+    [Authorize(AuthConstants.TrustedMemberPolicyName)]
     [HttpPost(ApiEndpoints.Genres.Create)]
     [ProducesResponseType(typeof(GenreResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
@@ -69,7 +68,7 @@ public class GenresController : ControllerBase
         return Ok(genres.MapToResponse());
     }
 
-    [Authorize(Roles = "admin,trusted_member")]
+    [Authorize(AuthConstants.TrustedMemberPolicyName)]
     [HttpPut(ApiEndpoints.Genres.Update)]
     [ProducesResponseType(typeof(GenreResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -82,7 +81,7 @@ public class GenresController : ControllerBase
         return result ? Ok() : NotFound();
     }
 
-    [Authorize(Roles = "admin,trusted_member")]
+    [Authorize(AuthConstants.AdminUserPolicyName)]
     [HttpDelete(ApiEndpoints.Genres.Delete)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

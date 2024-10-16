@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Logging;
+using MovieHub.Api.Auth;
 using MovieHub.Application.Models;
 
 namespace MovieHub.Api.Controllers;
@@ -18,21 +19,19 @@ public class MoviesController : ControllerBase
 {
     private readonly IMovieService _movieService;
     private readonly IGenreService _genreService;
-    private readonly IIdentityService _identityService;
     private readonly ILogger<MoviesController> _logger;
     private readonly IOutputCacheStore _outputCacheStore;
 
-    public MoviesController(IMovieService movieService, IIdentityService identityService,
+    public MoviesController(IMovieService movieService,
         ILogger<MoviesController> logger, IOutputCacheStore outputCacheStore, IGenreService genreService)
     {
         _movieService = movieService;
-        _identityService = identityService;
         _logger = logger;
         _outputCacheStore = outputCacheStore;
         _genreService = genreService;
     }
 
-    [Authorize(Roles = "admin,trusted_member")]
+    [Authorize(AuthConstants.TrustedMemberPolicyName)]
     [HttpPost(ApiEndpoints.Movies.Create)]
     [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
@@ -52,7 +51,7 @@ public class MoviesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get([FromRoute] string idOrSlug, CancellationToken token)
     {
-        var userId = GetUserId();
+        var userId = HttpContext.GetUserId();
         var movie = Guid.TryParse(idOrSlug, out var id)
             ? await _movieService.GetByIdAsync(id, userId, token)
             : await _movieService.GetBySlugAsync(idOrSlug, userId, token);
@@ -68,7 +67,7 @@ public class MoviesController : ControllerBase
     [ProducesResponseType(typeof(MoviesResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery] GetAllMoviesRequest request, CancellationToken token)
     {
-        var userId = GetUserId();
+        var userId = HttpContext.GetUserId();
         var options = request.MapToOptions().WithUser(userId);
         var movies = await _movieService.GetAllAsync(options, token);
         var movieCount = await _movieService.GetCountAsync(options.Title, options.YearOfRelease, token);
@@ -76,7 +75,7 @@ public class MoviesController : ControllerBase
         return Ok(moviesResponse);
     }
 
-    [Authorize(Roles = "admin,trusted_member")]
+    [Authorize(AuthConstants.TrustedMemberPolicyName)]
     [HttpPut(ApiEndpoints.Movies.Update)]
     [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -85,7 +84,7 @@ public class MoviesController : ControllerBase
         CancellationToken token)
     {
         var movie = request.MapToMovie(id);
-        var userId = GetUserId();
+        var userId = HttpContext.GetUserId();
         var updatedMovie = await _movieService.UpdateAsync(movie, userId, token);
         if (updatedMovie is null) return NotFound();
 
@@ -94,7 +93,7 @@ public class MoviesController : ControllerBase
         return Ok(response);
     }
 
-    [Authorize(Roles = "admin,trusted_member")]
+    [Authorize(AuthConstants.AdminUserPolicyName)]
     [HttpDelete(ApiEndpoints.Movies.Delete)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -105,22 +104,5 @@ public class MoviesController : ControllerBase
         await _outputCacheStore.EvictByTagAsync("movies", token);
         return Ok();
     }
-
-    private Guid? GetUserId()
-    {
-        var userIdStr = _identityService.GetUserIdentity();
-        if (string.IsNullOrEmpty(userIdStr))
-        {
-            _logger.LogWarning("User identity is null or empty. Proceeding without user ID.");
-            return null;
-        }
-
-        if (!Guid.TryParse(userIdStr, out var userId))
-        {
-            _logger.LogError("User identity is not a valid GUID. Actual value: {UserIdStr}", userIdStr);
-            throw new InvalidOperationException("User identity is not a valid GUID.");
-        }
-
-        return userId;
-    }
+    
 }
