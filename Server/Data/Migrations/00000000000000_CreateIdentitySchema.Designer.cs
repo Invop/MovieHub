@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-namespace MovieHub.Server.Data.Migrations
+namespace MovieHub.Data.Migrations
 {
     [DbContext(typeof(ApplicationIdentityDbContext))]
     [Migration("00000000000000_CreateIdentitySchema")]
@@ -20,7 +20,7 @@ namespace MovieHub.Server.Data.Migrations
                  .HasAnnotation("ProductVersion", "3.0.0")
                  .HasAnnotation("Sqlite:Autoincrement", true);
 
-            modelBuilder.Entity("MovieHub.Server.Models.ApplicationRole", b =>
+            modelBuilder.Entity("MovieHub.Models.ApplicationRole", b =>
                 {
                     b.Property<string>("Id");
 
@@ -128,7 +128,7 @@ namespace MovieHub.Server.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("MovieHub.Server.Models.ApplicationUser", b =>
+            modelBuilder.Entity("MovieHub.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id");
 
@@ -181,7 +181,7 @@ namespace MovieHub.Server.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("MovieHub.Server.Models.ApplicationRole")
+                    b.HasOne("MovieHub.Models.ApplicationRole")
                         .WithMany("Claims")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -189,7 +189,7 @@ namespace MovieHub.Server.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("MovieHub.Server.Models.ApplicationUser")
+                    b.HasOne("MovieHub.Models.ApplicationUser")
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -197,7 +197,7 @@ namespace MovieHub.Server.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("MovieHub.Server.Models.ApplicationUser")
+                    b.HasOne("MovieHub.Models.ApplicationUser")
                         .WithMany("Logins")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -205,7 +205,7 @@ namespace MovieHub.Server.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("MovieHub.Server.Models.ApplicationUser")
+                    b.HasOne("MovieHub.Models.ApplicationUser")
                         .WithMany("Tokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -213,12 +213,12 @@ namespace MovieHub.Server.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("MovieHub.Server.Models.ApplicationRole")
+                    b.HasOne("MovieHub.Models.ApplicationRole")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("MovieHub.Server.Models.ApplicationUser")
+                    b.HasOne("MovieHub.Models.ApplicationUser")
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);

@@ -1,217 +1,227 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-namespace MovieHub.Server.Data.Migrations;
-
-[DbContext(typeof(ApplicationIdentityDbContext))]
-internal class IdentityModelSnapshot : ModelSnapshot
+namespace MovieHub.Data.Migrations
 {
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    [DbContext(typeof(ApplicationIdentityDbContext))]
+    partial class IdentityModelSnapshot : ModelSnapshot
     {
-        modelBuilder
-            .HasAnnotation("ProductVersion", "3.0.0")
-            .HasAnnotation("Sqlite:Autoincrement", true);
-
-        modelBuilder.Entity("MovieHub.Server.Models.ApplicationRole", b =>
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
-            b.Property<string>("Id");
+            modelBuilder
+                 .HasAnnotation("ProductVersion", "3.0.0")
+                 .HasAnnotation("Sqlite:Autoincrement", true);
 
-            b.Property<string>("ConcurrencyStamp")
-                .IsConcurrencyToken();
+            modelBuilder.Entity("MovieHub.Models.ApplicationRole", b =>
+                {
+                    b.Property<string>("Id");
 
-            b.Property<string>("Name")
-                .HasAnnotation("MaxLength", 256);
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
 
-            b.Property<string>("NormalizedName")
-                .HasAnnotation("MaxLength", 256);
-            b.HasKey("Id");
+                    b.Property<string>("Name")
+                        .HasAnnotation("MaxLength", 256);
 
-            b.HasIndex("NormalizedName")
-                .IsUnique()
-                .HasDatabaseName("RoleNameIndex")
-                .HasFilter("[NormalizedName] IS NOT NULL");
+                    b.Property<string>("NormalizedName")
+                        .HasAnnotation("MaxLength", 256);
+                    b.HasKey("Id");
 
-            b.ToTable("AspNetRoles");
-        });
+                    b.HasIndex("NormalizedName")
 
-        modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
-        {
-            b.Property<int>("Id")
-                .ValueGeneratedOnAdd();
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
 
-            b.Property<string>("ClaimType");
+                    b.ToTable("AspNetRoles");
+                });
 
-            b.Property<string>("ClaimValue");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
 
-            b.Property<string>("RoleId")
-                .IsRequired();
+                    b.Property<string>("ClaimType");
 
-            b.HasKey("Id");
+                    b.Property<string>("ClaimValue");
 
-            b.HasIndex("RoleId");
+                    b.Property<string>("RoleId")
+                        .IsRequired();
 
-            b.ToTable("AspNetRoleClaims");
-        });
+                    b.HasKey("Id");
 
-        modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
-        {
-            b.Property<int>("Id")
-                .ValueGeneratedOnAdd();
+                    b.HasIndex("RoleId");
 
-            b.Property<string>("ClaimType");
+                    b.ToTable("AspNetRoleClaims");
+                });
 
-            b.Property<string>("ClaimValue");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
 
-            b.Property<string>("UserId")
-                .IsRequired();
+                    b.Property<string>("ClaimType");
 
-            b.HasKey("Id");
+                    b.Property<string>("ClaimValue");
 
-            b.HasIndex("UserId");
+                    b.Property<string>("UserId")
+                        .IsRequired();
 
-            b.ToTable("AspNetUserClaims");
-        });
+                    b.HasKey("Id");
 
-        modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
-        {
-            b.Property<string>("LoginProvider");
+                    b.HasIndex("UserId");
 
-            b.Property<string>("ProviderKey");
+                    b.ToTable("AspNetUserClaims");
+                });
 
-            b.Property<string>("ProviderDisplayName");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider");
 
-            b.Property<string>("UserId")
-                .IsRequired();
+                    b.Property<string>("ProviderKey");
 
-            b.HasKey("LoginProvider", "ProviderKey");
+                    b.Property<string>("ProviderDisplayName");
 
-            b.HasIndex("UserId");
+                    b.Property<string>("UserId")
+                        .IsRequired();
 
-            b.ToTable("AspNetUserLogins");
-        });
+                    b.HasKey("LoginProvider", "ProviderKey");
 
-        modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserRole<string>", b =>
-        {
-            b.Property<string>("UserId");
+                    b.HasIndex("UserId");
 
-            b.Property<string>("RoleId");
+                    b.ToTable("AspNetUserLogins");
+                });
 
-            b.HasKey("UserId", "RoleId");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId");
 
-            b.HasIndex("RoleId");
+                    b.Property<string>("RoleId");
 
-            b.ToTable("AspNetUserRoles");
-        });
+                    b.HasKey("UserId", "RoleId");
 
-        modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserToken<string>", b =>
-        {
-            b.Property<string>("UserId");
+                    b.HasIndex("RoleId");
 
-            b.Property<string>("LoginProvider");
+                    b.ToTable("AspNetUserRoles");
+                });
 
-            b.Property<string>("Name");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId");
 
-            b.Property<string>("Value");
+                    b.Property<string>("LoginProvider");
 
-            b.HasKey("UserId", "LoginProvider", "Name");
+                    b.Property<string>("Name");
 
-            b.ToTable("AspNetUserTokens");
-        });
+                    b.Property<string>("Value");
 
-        modelBuilder.Entity("MovieHub.Server.Models.ApplicationUser", b =>
-        {
-            b.Property<string>("Id");
+                    b.HasKey("UserId", "LoginProvider", "Name");
 
-            b.Property<int>("AccessFailedCount");
+                    b.ToTable("AspNetUserTokens");
+                });
 
-            b.Property<string>("ConcurrencyStamp")
-                .IsConcurrencyToken();
+            modelBuilder.Entity("MovieHub.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id");
 
-            b.Property<string>("Email")
-                .HasAnnotation("MaxLength", 256);
+                    b.Property<int>("AccessFailedCount");
 
-            b.Property<bool>("EmailConfirmed");
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
 
-            b.Property<bool>("LockoutEnabled");
+                    b.Property<string>("Email")
+                        .HasAnnotation("MaxLength", 256);
 
-            b.Property<DateTimeOffset?>("LockoutEnd");
+                    b.Property<bool>("EmailConfirmed");
 
-            b.Property<string>("NormalizedEmail")
-                .HasAnnotation("MaxLength", 256);
+                    b.Property<bool>("LockoutEnabled");
 
-            b.Property<string>("NormalizedUserName")
-                .HasAnnotation("MaxLength", 256);
+                    b.Property<DateTimeOffset?>("LockoutEnd");
 
-            b.Property<string>("PasswordHash");
+                    b.Property<string>("NormalizedEmail")
+                        .HasAnnotation("MaxLength", 256);
 
-            b.Property<string>("PhoneNumber");
+                    b.Property<string>("NormalizedUserName")
+                        .HasAnnotation("MaxLength", 256);
 
-            b.Property<bool>("PhoneNumberConfirmed");
+                    b.Property<string>("PasswordHash");
 
-            b.Property<string>("SecurityStamp");
+                    b.Property<string>("PhoneNumber");
 
-            b.Property<bool>("TwoFactorEnabled");
+                    b.Property<bool>("PhoneNumberConfirmed");
 
-            b.Property<string>("UserName")
-                .HasAnnotation("MaxLength", 256);
+                    b.Property<string>("SecurityStamp");
 
-            b.HasKey("Id");
+                    b.Property<bool>("TwoFactorEnabled");
 
-            b.HasIndex("NormalizedEmail")
-                .HasDatabaseName("EmailIndex");
+                    b.Property<string>("UserName")
+                        .HasAnnotation("MaxLength", 256);
 
-            b.HasIndex("NormalizedUserName")
-                .IsUnique()
-                .HasDatabaseName("UserNameIndex")
-                .HasFilter("[NormalizedUserName] IS NOT NULL");
+                    b.HasKey("Id");
 
-            b.ToTable("AspNetUsers");
-        });
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers");
+                });
 
 
-        modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
-        {
-            b.HasOne("MovieHub.Server.Models.ApplicationRole")
-                .WithMany("Claims")
-                .HasForeignKey("RoleId")
-                .OnDelete(DeleteBehavior.Cascade);
-        });
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("MovieHub.Models.ApplicationRole")
+                        .WithMany("Claims")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
 
-        modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
-        {
-            b.HasOne("MovieHub.Server.Models.ApplicationUser")
-                .WithMany("Claims")
-                .HasForeignKey("UserId")
-                .OnDelete(DeleteBehavior.Cascade);
-        });
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("MovieHub.Models.ApplicationUser")
+                        .WithMany("Claims")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
 
-        modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
-        {
-            b.HasOne("MovieHub.Server.Models.ApplicationUser")
-                .WithMany("Logins")
-                .HasForeignKey("UserId")
-                .OnDelete(DeleteBehavior.Cascade);
-        });
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("MovieHub.Models.ApplicationUser")
+                        .WithMany("Logins")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
 
-        modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserToken<string>", b =>
-        {
-            b.HasOne("MovieHub.Server.Models.ApplicationUser")
-                .WithMany("Tokens")
-                .HasForeignKey("UserId")
-                .OnDelete(DeleteBehavior.Cascade);
-        });
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("MovieHub.Models.ApplicationUser")
+                        .WithMany("Tokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
 
-        modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserRole<string>", b =>
-        {
-            b.HasOne("MovieHub.Server.Models.ApplicationRole")
-                .WithMany("Users")
-                .HasForeignKey("RoleId")
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("MovieHub.Models.ApplicationRole")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-            b.HasOne("MovieHub.Server.Models.ApplicationUser")
-                .WithMany("Roles")
-                .HasForeignKey("UserId")
-                .OnDelete(DeleteBehavior.Cascade);
-        });
+                    b.HasOne("MovieHub.Models.ApplicationUser")
+                        .WithMany("Roles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+        }
     }
 }

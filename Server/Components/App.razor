@@ -3,28 +3,29 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <base href="@NavigationManager.BaseUri"/>
-    <RadzenTheme @rendermode="@InteractiveWebAssembly" Theme="material"/>
-    <link rel="stylesheet" href="css/site.css"/>
-    <link rel="icon" href="favicon.ico"/>
-    <HeadOutlet @rendermode="@InteractiveWebAssembly"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="@NavigationManager.BaseUri" />
+    <RadzenTheme @rendermode="@InteractiveServer" Theme="material" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="icon" href="favicon.ico" />
+    <HeadOutlet @rendermode="@InteractiveServer" />
 </head>
 
 <body>
-<Routes @rendermode="@InteractiveWebAssembly"/>
-<script src="_framework/blazor.web.js"></script>
-<script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Colors).Assembly.GetName().Version)"></script>
+    <Routes @rendermode="@InteractiveServer" />
+    <script src="_framework/blazor.web.js"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
 </body>
 
 </html>
 
 @code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; }
 
-    [CascadingParameter] private HttpContext HttpContext { get; set; }
-
-    [Inject] private ThemeService ThemeService { get; set; }
+    [Inject]
+    private ThemeService ThemeService { get; set; }
 
     protected override void OnInitialized()
     {
@@ -40,5 +41,4 @@
             }
         }
     }
-
 }

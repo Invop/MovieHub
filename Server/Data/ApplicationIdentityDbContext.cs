@@ -1,31 +1,37 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using MovieHub.Server.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
-namespace MovieHub.Server.Data;
+using MovieHub.Models;
 
-public partial class ApplicationIdentityDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
+namespace MovieHub.Data
 {
-    public ApplicationIdentityDbContext(DbContextOptions<ApplicationIdentityDbContext> options) : base(options)
+    public partial class ApplicationIdentityDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
     {
-    }
+        public ApplicationIdentityDbContext(DbContextOptions<ApplicationIdentityDbContext> options) : base(options)
+        {
+        }
 
-    public ApplicationIdentityDbContext()
-    {
-    }
+        public ApplicationIdentityDbContext()
+        {
+        }
 
-    partial void OnModelBuilding(ModelBuilder builder);
+        partial void OnModelBuilding(ModelBuilder builder);
 
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        base.OnModelCreating(builder);
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
 
-        builder.Entity<ApplicationUser>()
-            .HasMany(u => u.Roles)
-            .WithMany(r => r.Users)
-            .UsingEntity<IdentityUserRole<string>>();
+            builder.Entity<ApplicationUser>()
+                   .HasMany(u => u.Roles)
+                   .WithMany(r => r.Users)
+                   .UsingEntity<IdentityUserRole<string>>();
 
-        OnModelBuilding(builder);
+            this.OnModelBuilding(builder);
+        }
     }
 }

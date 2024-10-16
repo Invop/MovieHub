@@ -1,26 +1,33 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
-namespace MovieHub.Server.Data;
-
-public class BlankTriggerAddingConvention : IModelFinalizingConvention
+namespace MovieHub.Data
 {
-    public virtual void ProcessModelFinalizing(
-        IConventionModelBuilder modelBuilder,
-        IConventionContext<IConventionModelBuilder> context)
+    public class BlankTriggerAddingConvention : Microsoft.EntityFrameworkCore.Metadata.Conventions.IModelFinalizingConvention
     {
-        foreach (var entityType in modelBuilder.Metadata.GetEntityTypes())
+        public virtual void ProcessModelFinalizing(
+            Microsoft.EntityFrameworkCore.Metadata.Builders.IConventionModelBuilder modelBuilder,
+            Microsoft.EntityFrameworkCore.Metadata.Conventions.IConventionContext<Microsoft.EntityFrameworkCore.Metadata.Builders.IConventionModelBuilder> context)
         {
-            var table = StoreObjectIdentifier.Create(entityType, StoreObjectType.Table);
-            if (table != null
-                && entityType.GetDeclaredTriggers().All(t => t.GetDatabaseName(table.Value) == null))
-                entityType.Builder.HasTrigger(table.Value.Name + "_Trigger");
+            foreach (var entityType in modelBuilder.Metadata.GetEntityTypes())
+            {
+                var table = Microsoft.EntityFrameworkCore.Metadata.StoreObjectIdentifier.Create(entityType, Microsoft.EntityFrameworkCore.Metadata.StoreObjectType.Table);
+                if (table != null
+                    && entityType.GetDeclaredTriggers().All(t => t.GetDatabaseName(table.Value) == null))
+                {
+                    entityType.Builder.HasTrigger(table.Value.Name + "_Trigger");
+                }
 
-            foreach (var fragment in entityType.GetMappingFragments(StoreObjectType.Table))
-                if (entityType.GetDeclaredTriggers().All(t => t.GetDatabaseName(fragment.StoreObject) == null))
-                    entityType.Builder.HasTrigger(fragment.StoreObject.Name + "_Trigger");
+                foreach (var fragment in entityType.GetMappingFragments(Microsoft.EntityFrameworkCore.Metadata.StoreObjectType.Table))
+                {
+                    if (entityType.GetDeclaredTriggers().All(t => t.GetDatabaseName(fragment.StoreObject) == null))
+                    {
+                        entityType.Builder.HasTrigger(fragment.StoreObject.Name + "_Trigger");
+                    }
+                }
+            }
         }
     }
 }

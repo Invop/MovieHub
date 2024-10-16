@@ -1,22 +1,20 @@
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.OData;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OData.ModelBuilder;
-using MovieHub.Client;
-using MovieHub.Client.Services;
-using MovieHub.Server;
-using MovieHub.Server.Components;
-using MovieHub.Server.Data;
-using MovieHub.Server.Models;
-using MovieHub.Server.Services;
+using System.Net.Http.Headers;
 using Radzen;
-using _Imports = MovieHub.Client._Imports;
-using IdentityDbService = MovieHub.Client.Services.IdentityDbService;
+using MovieHub.Components;
+using Microsoft.EntityFrameworkCore;
+using MovieHub.Data;
+using Microsoft.AspNetCore.Identity;
+using MovieHub.Models;
+using Microsoft.AspNetCore.OData;
+using Microsoft.OData.ModelBuilder;
+using Microsoft.AspNetCore.Components.Authorization;
+using MovieHub;
+using MovieHub.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-builder.Services.AddRazorComponents().AddInteractiveWebAssemblyComponents();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents()
+    .AddHubOptions(options => options.MaximumReceiveMessageSize = 10 * 1024 * 1024);
 builder.Services.AddControllers();
 builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenCookieThemeService(options =>
@@ -25,28 +23,21 @@ builder.Services.AddRadzenCookieThemeService(options =>
     options.Duration = TimeSpan.FromDays(365);
 });
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<MovieHub.Server.Services.IdentityDbService>();
-builder.Services.AddDbContext<IdentityDbContext>(options =>
+builder.Services.AddScoped<MovieHub.IdentityDbService>();
+builder.Services.AddDbContext<MovieHub.Data.IdentityDbContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("IdentityDBConnection"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("IdentityDbConnection"));
 });
-builder.Services.AddControllers().AddOData(opt =>
-{
-    var oDataBuilderIdentityDb = new ODataConventionModelBuilder();
-    opt.AddRouteComponents("odata/IdentityDB", oDataBuilderIdentityDb.GetEdmModel()).Count().Filter().OrderBy().Expand()
-        .Select().SetMaxTop(null).TimeZone = TimeZoneInfo.Utc;
-});
-builder.Services.AddScoped<IdentityDbService>();
-builder.Services.AddHttpClient("MovieHub.Server")
+builder.Services.AddHttpClient("MovieHub")
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false })
     .AddHeaderPropagation(o => o.Headers.Add("Cookie"));
 builder.Services.AddHeaderPropagation(o => o.Headers.Add("Cookie"));
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<SecurityService>();
+builder.Services.AddScoped<MovieHub.SecurityService>();
 builder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("IdentityDBConnection"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("IdentityDbConnection"));
 });
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationIdentityDbContext>().AddDefaultTokenProviders();
@@ -62,15 +53,14 @@ builder.Services.AddControllers().AddOData(o =>
         .SetMaxTop(null).TimeZone = TimeZoneInfo.Utc;
 });
 builder.Services.AddScoped<AuthenticationStateProvider, ApplicationAuthenticationStateProvider>();
+builder.Services.AddHttpClient("TokenClient",
+    client => { client.BaseAddress = new Uri(builder.Configuration["AuthApiBaseUrl"]!); });
+
 var app = builder.Build();
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
-    app.UseWebAssemblyDebugging();
-}
-else
-{
-    app.UseExceptionHandler("/Error", true);
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
@@ -82,6 +72,6 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
-app.MapRazorComponents<App>().AddInteractiveWebAssemblyRenderMode().AddAdditionalAssemblies(typeof(_Imports).Assembly);
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 app.Services.CreateScope().ServiceProvider.GetRequiredService<ApplicationIdentityDbContext>().Database.Migrate();
 app.Run();
