@@ -1,0 +1,13 @@
+### Request Token from IdentityController
+POST https://localhost:5003/token
+Content-Type: application/json
+
+{
+  "userid": "d8566de3-b1a6-4a9b-b842-8e3887a82e41",
+  "email": "invop@invop.com",
+  "customClaims": {
+    "admin": true,
+    "trusted_member": true
+  }
+}
+###
