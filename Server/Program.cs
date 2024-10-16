@@ -59,6 +59,9 @@ builder.Services.AddHttpClient("TokenClient",
 builder.Services
     .AddTransient<ITokenManager, TokenManager>();
 
+builder.Services.AddHttpClient("MovieApiClient",
+    client => { client.BaseAddress = new Uri(builder.Configuration["MoviesApiBaseUrl"]!); });
+builder.Services.AddScoped<MovieService>();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
