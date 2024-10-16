@@ -56,6 +56,9 @@ builder.Services.AddScoped<AuthenticationStateProvider, ApplicationAuthenticatio
 builder.Services.AddHttpClient("TokenClient",
     client => { client.BaseAddress = new Uri(builder.Configuration["AuthApiBaseUrl"]!); });
 
+builder.Services
+    .AddTransient<ITokenManager, TokenManager>();
+
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

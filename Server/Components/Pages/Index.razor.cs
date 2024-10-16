@@ -1,5 +1,7 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using MovieHub.Services;
 using Radzen;
 
 namespace MovieHub.Components.Pages
@@ -27,11 +29,14 @@ namespace MovieHub.Components.Pages
         [Inject]
         protected SecurityService Security { get; set; }
         
+        [Inject]
+        protected ITokenManager TokenManager { get; set; }
 
-        
+        private string Token { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
+            Token = await TokenManager.GetTokenAsync();
         }
     }
 }
