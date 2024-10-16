@@ -1,33 +1,19 @@
-
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Web;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Components;
-using System.Threading.Tasks;
-using Radzen;
 
-namespace MovieHub.Client
+namespace MovieHub.Client.Services
 {
-    public partial class IdentityDBService
+    public partial class IdentityDbService
     {
-        private readonly HttpClient httpClient;
-        private readonly Uri baseUri;
-        private readonly NavigationManager navigationManager;
+        private readonly HttpClient _httpClient;
+        private readonly Uri _baseUri;
+        private readonly NavigationManager _navigationManager;
 
-        public IdentityDBService(NavigationManager navigationManager, HttpClient httpClient, IConfiguration configuration)
+        public IdentityDbService(NavigationManager navigationManager, HttpClient httpClient, IConfiguration configuration)
         {
-            this.httpClient = httpClient;
+            this._httpClient = httpClient;
 
-            this.navigationManager = navigationManager;
-            this.baseUri = new Uri($"{navigationManager.BaseUri}odata/IdentityDB/");
+            this._navigationManager = navigationManager;
+            this._baseUri = new Uri($"{navigationManager.BaseUri}odata/IdentityDB/");
         }
 
     }

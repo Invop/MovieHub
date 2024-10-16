@@ -3,15 +3,15 @@
 
 <RadzenRow>
     <RadzenColumn SizeMD="12">
-        <RadzenTemplateForm TItem="MovieHub.Server.Models.ApplicationRole" Data="@role" Visible="@(role != null)" Submit="@FormSubmit">
-            <RadzenAlert Title="Cannot create role" Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">@error</RadzenAlert>
+        <RadzenTemplateForm TItem="MovieHub.Server.Models.ApplicationRole" Data="@Role" Visible="@(Role != null)" Submit="@FormSubmit">
+            <RadzenAlert Title="Cannot create role" Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@ErrorVisible">@Error</RadzenAlert>
 
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
                     <RadzenLabel Component="Name" style="width: 100%" Text="Name" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@(role.Name)" Name="Name" />
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@(Role.Name)" Name="Name" />
                     <RadzenRequiredValidator Component="Name" Text="Name is required" />
                 </RadzenColumn>
             </RadzenRow>

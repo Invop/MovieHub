@@ -6,8 +6,8 @@
 <RadzenRow>
     <RadzenColumn SizeMD="12">
         <RadzenTemplateForm Action="@($"account/verifysecuritycode")" Data="@("code")" Method="post">
-            <RadzenText Text="@message" TextStyle="Radzen.Blazor.TextStyle.Body2" TagName="Radzen.Blazor.TagName.P" />
-            <RadzenSecurityCode @ref=sc Count="6" Name="code" Change=@VerifySecurityCode />
+            <RadzenText Text="@_message" TextStyle="Radzen.Blazor.TextStyle.Body2" TagName="Radzen.Blazor.TagName.P" />
+            <RadzenSecurityCode @ref=_sc Count="6" Name="code" Change=@VerifySecurityCode />
         </RadzenTemplateForm>
     </RadzenColumn>
 </RadzenRow>

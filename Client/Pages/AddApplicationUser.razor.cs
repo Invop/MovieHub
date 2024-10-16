@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using MovieHub.Client.Services;
 using Radzen;
 using Radzen.Blazor;
 
@@ -13,7 +14,7 @@ namespace MovieHub.Client.Pages
     public partial class AddApplicationUser
     {
         [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        protected IJSRuntime JsRuntime { get; set; }
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
@@ -30,34 +31,34 @@ namespace MovieHub.Client.Pages
         [Inject]
         protected NotificationService NotificationService { get; set; }
 
-        protected IEnumerable<MovieHub.Server.Models.ApplicationRole> roles;
-        protected MovieHub.Server.Models.ApplicationUser user;
-        protected IEnumerable<string> userRoles = Enumerable.Empty<string>();
-        protected string error;
-        protected bool errorVisible;
+        protected IEnumerable<MovieHub.Server.Models.ApplicationRole> Roles;
+        protected MovieHub.Server.Models.ApplicationUser User;
+        protected IEnumerable<string> UserRoles = Enumerable.Empty<string>();
+        protected string Error;
+        protected bool ErrorVisible;
 
         [Inject]
         protected SecurityService Security { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            user = new MovieHub.Server.Models.ApplicationUser();
+            User = new MovieHub.Server.Models.ApplicationUser();
 
-            roles = await Security.GetRoles();
+            Roles = await Security.GetRoles();
         }
 
         protected async Task FormSubmit(MovieHub.Server.Models.ApplicationUser user)
         {
             try
             {
-                user.Roles = roles.Where(role => userRoles.Contains(role.Id)).ToList();
+                user.Roles = Roles.Where(role => UserRoles.Contains(role.Id)).ToList();
                 await Security.CreateUser(user);
                 DialogService.Close(null);
             }
             catch (Exception ex)
             {
-                errorVisible = true;
-                error = ex.Message;
+                ErrorVisible = true;
+                Error = ex.Message;
             }
         }
 

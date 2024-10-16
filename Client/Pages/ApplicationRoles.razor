@@ -15,8 +15,8 @@
     </RadzenRow>
     <RadzenRow>
         <RadzenColumn SizeMD="12">
-            <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Cannot delete role" Visible="@errorVisible">@error</RadzenAlert>
-            <RadzenDataGrid @ref="grid0" AllowFiltering="true" AllowPaging="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) AllowSorting="true" Data="@roles" TItem="MovieHub.Server.Models.ApplicationRole">
+            <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Cannot delete role" Visible="@ErrorVisible">@Error</RadzenAlert>
+            <RadzenDataGrid @ref="Grid0" AllowFiltering="true" AllowPaging="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) AllowSorting="true" Data="@Roles" TItem="MovieHub.Server.Models.ApplicationRole">
                 <Columns>
                     <RadzenDataGridColumn TItem="MovieHub.Server.Models.ApplicationRole" Property="Name" Title="Name" />
                     <RadzenDataGridColumn TItem="MovieHub.Server.Models.ApplicationRole" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">

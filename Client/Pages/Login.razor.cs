@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using MovieHub.Client.Services;
 using Radzen;
 using Radzen.Blazor;
 
@@ -13,7 +14,7 @@ namespace MovieHub.Client.Pages
     public partial class Login
     {
         [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        protected IJSRuntime JsRuntime { get; set; }
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
@@ -30,11 +31,11 @@ namespace MovieHub.Client.Pages
         [Inject]
         protected NotificationService NotificationService { get; set; }
 
-        protected string redirectUrl;
-        protected string error;
-        protected string info;
-        protected bool errorVisible;
-        protected bool infoVisible;
+        protected string RedirectUrl;
+        protected string Error;
+        protected string Info;
+        protected bool ErrorVisible;
+        protected bool InfoVisible;
 
         [Inject]
         protected SecurityService Security { get; set; }
@@ -43,15 +44,15 @@ namespace MovieHub.Client.Pages
         {
             var query = System.Web.HttpUtility.ParseQueryString(new Uri(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).ToString()).Query);
 
-            error = query.Get("error");
+            Error = query.Get("error");
 
-            info = query.Get("info");
+            Info = query.Get("info");
 
-            redirectUrl = query.Get("redirectUrl");
+            RedirectUrl = query.Get("redirectUrl");
 
-            errorVisible = !string.IsNullOrEmpty(error);
+            ErrorVisible = !string.IsNullOrEmpty(Error);
 
-            infoVisible = !string.IsNullOrEmpty(info);
+            InfoVisible = !string.IsNullOrEmpty(Info);
         }
     }
 }

@@ -15,8 +15,8 @@
     </RadzenRow>
     <RadzenRow>
         <RadzenColumn SizeMD="12">
-            <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Cannot delete user" Visible="@errorVisible">@error</RadzenAlert>
-            <RadzenDataGrid @ref="grid0" AllowFiltering="true" AllowPaging="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) AllowSorting="true" Data="@users"
+            <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Cannot delete user" Visible="@ErrorVisible">@Error</RadzenAlert>
+            <RadzenDataGrid @ref="Grid0" AllowFiltering="true" AllowPaging="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) AllowSorting="true" Data="@Users"
                 TItem="MovieHub.Server.Models.ApplicationUser" RowSelect="@RowSelect">
                 <Columns>
                     <RadzenDataGridColumn TItem="MovieHub.Server.Models.ApplicationUser" Property="UserName" Title="User Name" />

@@ -28,14 +28,14 @@
             </RadzenColumn>
         </RadzenRow>
     </RadzenHeader>
-    <RadzenBody Expanded="@sidebarExpanded">
+    <RadzenBody Expanded="@_sidebarExpanded">
         <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-2 rz-pt-md-4 rz-pt-lg-6 rz-pt-xl-12 rz-pb-2 rz-pb-lg-12" Style="max-width: 1440px;">
             <RadzenColumn Size="12">
             @Body
             </RadzenColumn>
         </RadzenRow>
     </RadzenBody>
-    <RadzenSidebar Expanded="@sidebarExpanded" style="z-index: 2">
+    <RadzenSidebar Expanded="@_sidebarExpanded" style="z-index: 2">
         <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border);">
             <RadzenImage Path="images/logo.png"  style="width: 48px; height: 48px;" AlternateText="Application logo"></RadzenImage>
             <RadzenText Text="MovieHub" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" class="rz-mb-0" style="color: var(--rz-sidebar-color);" />

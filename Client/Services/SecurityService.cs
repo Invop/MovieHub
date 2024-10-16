@@ -1,30 +1,21 @@
-using System;
-using System.Web;
-using System.Linq;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-
+using MovieHub.Server.Models;
 using Radzen;
 
-using MovieHub.Server.Models;
-
-namespace MovieHub.Client
+namespace MovieHub.Client.Services
 {
     public partial class SecurityService
     {
 
-        private readonly HttpClient httpClient;
+        private readonly HttpClient _httpClient;
 
-        private readonly Uri baseUri;
+        private readonly Uri _baseUri;
 
-        private readonly NavigationManager navigationManager;
+        private readonly NavigationManager _navigationManager;
 
         public ApplicationUser User { get; private set; } = new ApplicationUser { Name = "Anonymous" };
 
@@ -32,9 +23,9 @@ namespace MovieHub.Client
 
         public SecurityService(NavigationManager navigationManager, IHttpClientFactory factory)
         {
-            this.baseUri = new Uri($"{navigationManager.BaseUri}odata/Identity/");
-            this.httpClient = factory.CreateClient("MovieHub.Server");
-            this.navigationManager = navigationManager;
+            this._baseUri = new Uri($"{navigationManager.BaseUri}odata/Identity/");
+            this._httpClient = factory.CreateClient("MovieHub.Server");
+            this._navigationManager = navigationManager;
         }
 
         public bool IsInRole(params string[] roles)
@@ -93,30 +84,30 @@ namespace MovieHub.Client
 
         public async Task<ApplicationAuthenticationState> GetAuthenticationStateAsync()
         {
-            var uri =  new Uri($"{navigationManager.BaseUri}Account/CurrentUser");
+            var uri =  new Uri($"{_navigationManager.BaseUri}Account/CurrentUser");
 
-            var response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, uri));
+            var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, uri));
 
             return await response.ReadAsync<ApplicationAuthenticationState>();
         }
 
         public void Logout()
         {
-            navigationManager.NavigateTo("Account/Logout", true);
+            _navigationManager.NavigateTo("Account/Logout", true);
         }
 
         public void Login()
         {
-            navigationManager.NavigateTo("Login", true);
+            _navigationManager.NavigateTo("Login", true);
         }
 
         public async Task<IEnumerable<ApplicationRole>> GetRoles()
         {
-            var uri = new Uri(baseUri, $"ApplicationRoles");
+            var uri = new Uri(_baseUri, $"ApplicationRoles");
 
             uri = uri.GetODataUri();
 
-            var response = await httpClient.GetAsync(uri);
+            var response = await _httpClient.GetAsync(uri);
 
             var result = await response.ReadAsync<ODataServiceResult<ApplicationRole>>();
 
@@ -125,30 +116,30 @@ namespace MovieHub.Client
 
         public async Task<ApplicationRole> CreateRole(ApplicationRole role)
         {
-            var uri = new Uri(baseUri, $"ApplicationRoles");
+            var uri = new Uri(_baseUri, $"ApplicationRoles");
 
             var content = new StringContent(ODataJsonSerializer.Serialize(role), Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PostAsync(uri, content);
+            var response = await _httpClient.PostAsync(uri, content);
 
             return await response.ReadAsync<ApplicationRole>();
         }
 
         public async Task<HttpResponseMessage> DeleteRole(string id)
         {
-            var uri = new Uri(baseUri, $"ApplicationRoles('{id}')");
+            var uri = new Uri(_baseUri, $"ApplicationRoles('{id}')");
 
-            return await httpClient.DeleteAsync(uri);
+            return await _httpClient.DeleteAsync(uri);
         }
 
         public async Task<IEnumerable<ApplicationUser>> GetUsers()
         {
-            var uri = new Uri(baseUri, $"ApplicationUsers");
+            var uri = new Uri(_baseUri, $"ApplicationUsers");
 
 
             uri = uri.GetODataUri();
 
-            var response = await httpClient.GetAsync(uri);
+            var response = await _httpClient.GetAsync(uri);
 
             var result = await response.ReadAsync<ODataServiceResult<ApplicationUser>>();
 
@@ -157,27 +148,27 @@ namespace MovieHub.Client
 
         public async Task<ApplicationUser> CreateUser(ApplicationUser user)
         {
-            var uri = new Uri(baseUri, $"ApplicationUsers");
+            var uri = new Uri(_baseUri, $"ApplicationUsers");
 
             var content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PostAsync(uri, content);
+            var response = await _httpClient.PostAsync(uri, content);
 
             return await response.ReadAsync<ApplicationUser>();
         }
 
         public async Task<HttpResponseMessage> DeleteUser(string id)
         {
-            var uri = new Uri(baseUri, $"ApplicationUsers('{id}')");
+            var uri = new Uri(_baseUri, $"ApplicationUsers('{id}')");
 
-            return await httpClient.DeleteAsync(uri);
+            return await _httpClient.DeleteAsync(uri);
         }
 
         public async Task<ApplicationUser> GetUserById(string id)
         {
-            var uri = new Uri(baseUri, $"ApplicationUsers('{id}')?$expand=Roles");
+            var uri = new Uri(_baseUri, $"ApplicationUsers('{id}')?$expand=Roles");
 
-            var response = await httpClient.GetAsync(uri);
+            var response = await _httpClient.GetAsync(uri);
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -189,27 +180,27 @@ namespace MovieHub.Client
 
         public async Task<ApplicationUser> UpdateUser(string id, ApplicationUser user)
         {
-            var uri = new Uri(baseUri, $"ApplicationUsers('{id}')");
+            var uri = new Uri(_baseUri, $"ApplicationUsers('{id}')");
 
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Patch, uri)
             {
                 Content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json")
             };
 
-            var response = await httpClient.SendAsync(httpRequestMessage);
+            var response = await _httpClient.SendAsync(httpRequestMessage);
 
             return await response.ReadAsync<ApplicationUser>();
         }
         public async Task ChangePassword(string oldPassword, string newPassword)
         {
-            var uri =  new Uri($"{navigationManager.BaseUri}Account/ChangePassword");
+            var uri =  new Uri($"{_navigationManager.BaseUri}Account/ChangePassword");
 
             var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "oldPassword", oldPassword },
                 { "newPassword", newPassword }
             });
 
-            var response = await httpClient.PostAsync(uri, content);
+            var response = await _httpClient.PostAsync(uri, content);
 
             if (!response.IsSuccessStatusCode)
             {

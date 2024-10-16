@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using MovieHub.Client;
+using MovieHub.Client.Services;
 using MovieHub.Server;
 using MovieHub.Server.Components;
 using MovieHub.Server.Data;
@@ -11,6 +12,7 @@ using MovieHub.Server.Models;
 using MovieHub.Server.Services;
 using Radzen;
 using _Imports = MovieHub.Client._Imports;
+using IdentityDbService = MovieHub.Client.Services.IdentityDbService;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -23,7 +25,7 @@ builder.Services.AddRadzenCookieThemeService(options =>
     options.Duration = TimeSpan.FromDays(365);
 });
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IdentityDbService>();
+builder.Services.AddScoped<MovieHub.Server.Services.IdentityDbService>();
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("IdentityDBConnection"));
@@ -34,7 +36,7 @@ builder.Services.AddControllers().AddOData(opt =>
     opt.AddRouteComponents("odata/IdentityDB", oDataBuilderIdentityDb.GetEdmModel()).Count().Filter().OrderBy().Expand()
         .Select().SetMaxTop(null).TimeZone = TimeZoneInfo.Utc;
 });
-builder.Services.AddScoped<MovieHub.Client.IdentityDBService>();
+builder.Services.AddScoped<IdentityDbService>();
 builder.Services.AddHttpClient("MovieHub.Server")
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false })
     .AddHeaderPropagation(o => o.Headers.Add("Cookie"));

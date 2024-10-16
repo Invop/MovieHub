@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using MovieHub.Client.Services;
 using Radzen;
 using Radzen.Blazor;
 
@@ -13,7 +14,7 @@ namespace MovieHub.Client.Pages
     public partial class ApplicationUsers
     {
         [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        protected IJSRuntime JsRuntime { get; set; }
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
@@ -30,31 +31,31 @@ namespace MovieHub.Client.Pages
         [Inject]
         protected NotificationService NotificationService { get; set; }
 
-        protected IEnumerable<MovieHub.Server.Models.ApplicationUser> users;
-        protected RadzenDataGrid<MovieHub.Server.Models.ApplicationUser> grid0;
-        protected string error;
-        protected bool errorVisible;
+        protected IEnumerable<MovieHub.Server.Models.ApplicationUser> Users;
+        protected RadzenDataGrid<MovieHub.Server.Models.ApplicationUser> Grid0;
+        protected string Error;
+        protected bool ErrorVisible;
 
         [Inject]
         protected SecurityService Security { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            users = await Security.GetUsers();
+            Users = await Security.GetUsers();
         }
 
         protected async Task AddClick()
         {
             await DialogService.OpenAsync<AddApplicationUser>("Add Application User");
 
-            users = await Security.GetUsers();
+            Users = await Security.GetUsers();
         }
 
         protected async Task RowSelect(MovieHub.Server.Models.ApplicationUser user)
         {
             await DialogService.OpenAsync<EditApplicationUser>("Edit Application User", new Dictionary<string, object>{ {"Id", user.Id} });
 
-            users = await Security.GetUsers();
+            Users = await Security.GetUsers();
         }
 
         protected async Task DeleteClick(MovieHub.Server.Models.ApplicationUser user)
@@ -65,13 +66,13 @@ namespace MovieHub.Client.Pages
                 {
                     await Security.DeleteUser($"{user.Id}");
 
-                    users = await Security.GetUsers();
+                    Users = await Security.GetUsers();
                 }
             }
             catch (Exception ex)
             {
-                errorVisible = true;
-                error = ex.Message;
+                ErrorVisible = true;
+                Error = ex.Message;
             }
         }
     }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using MovieHub.Client.Services;
 using Radzen;
 using Radzen.Blazor;
 
@@ -13,7 +14,7 @@ namespace MovieHub.Client.Pages
     public partial class SecurityCode
     {
         [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        protected IJSRuntime JsRuntime { get; set; }
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
@@ -34,21 +35,21 @@ namespace MovieHub.Client.Pages
         {
             if (code.Count() == 6)
             {
-                await JSRuntime.InvokeVoidAsync("eval", "document.forms[0].submit()");
+                await JsRuntime.InvokeVoidAsync("eval", "document.forms[0].submit()");
             }
         }
 
-        string message;
+        string _message;
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
 
             var uri = new Uri(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).ToString());
             var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
-            message = $"We sent a verification code to {query.Get("email")}. Enter the code from the email below.";
+            _message = $"We sent a verification code to {query.Get("email")}. Enter the code from the email below.";
         }
 
-        RadzenSecurityCode sc;
+        RadzenSecurityCode _sc;
 
         [Inject]
         protected SecurityService Security { get; set; }
@@ -58,7 +59,7 @@ namespace MovieHub.Client.Pages
 
             if (firstRender)
             {
-                await sc.FocusAsync();
+                await _sc.FocusAsync();
             }
         }
     }

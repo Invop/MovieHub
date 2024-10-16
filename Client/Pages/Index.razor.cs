@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
+using MovieHub.Client.Services;
 using Radzen;
 using Radzen.Blazor;
 
@@ -15,7 +16,7 @@ namespace MovieHub.Client.Pages
     public partial class Index
     {
         [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        protected IJSRuntime JsRuntime { get; set; }
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }

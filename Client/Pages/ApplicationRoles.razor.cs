@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using MovieHub.Client.Services;
 using Radzen;
 using Radzen.Blazor;
 
@@ -13,7 +14,7 @@ namespace MovieHub.Client.Pages
     public partial class ApplicationRoles
     {
         [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        protected IJSRuntime JsRuntime { get; set; }
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
@@ -30,24 +31,24 @@ namespace MovieHub.Client.Pages
         [Inject]
         protected NotificationService NotificationService { get; set; }
 
-        protected IEnumerable<MovieHub.Server.Models.ApplicationRole> roles;
-        protected RadzenDataGrid<MovieHub.Server.Models.ApplicationRole> grid0;
-        protected string error;
-        protected bool errorVisible;
+        protected IEnumerable<MovieHub.Server.Models.ApplicationRole> Roles;
+        protected RadzenDataGrid<MovieHub.Server.Models.ApplicationRole> Grid0;
+        protected string Error;
+        protected bool ErrorVisible;
 
         [Inject]
         protected SecurityService Security { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            roles = await Security.GetRoles();
+            Roles = await Security.GetRoles();
         }
 
         protected async Task AddClick()
         {
             await DialogService.OpenAsync<AddApplicationRole>("Add Application Role");
 
-            roles = await Security.GetRoles();
+            Roles = await Security.GetRoles();
         }
 
         protected async Task DeleteClick(MovieHub.Server.Models.ApplicationRole role)
@@ -58,13 +59,13 @@ namespace MovieHub.Client.Pages
                 {
                     await Security.DeleteRole($"{role.Id}");
 
-                    roles = await Security.GetRoles();
+                    Roles = await Security.GetRoles();
                 }
             }
             catch (Exception ex)
             {
-                errorVisible = true;
-                error = ex.Message;
+                ErrorVisible = true;
+                Error = ex.Message;
             }
         }
     }
