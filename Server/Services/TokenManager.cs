@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 
@@ -30,12 +25,13 @@ namespace MovieHub.Services
 
         public async Task<string> GetTokenAsync()
         {
-            var userCache = _securityService.User.GetHashCode();
+            var userCache = GenerateUserCacheKey(_securityService.User.Email);
             var cachedToken = await _cache.GetStringAsync($"{CacheKey}:{userCache}");
             if (!string.IsNullOrEmpty(cachedToken) && IsTokenValid(cachedToken))
             {
                 return cachedToken;
             }
+
             if (!IsValidUserEmail())
             {
                 return null;
@@ -105,6 +101,20 @@ namespace MovieHub.Services
         {
             var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
             return jwtToken?.ValidTo > DateTime.UtcNow;
+        }
+        
+        private string GenerateUserCacheKey(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                throw new ArgumentNullException(nameof(email));
+
+            // Use SHA256 to generate a consistent hash
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(email.ToLowerInvariant());
+                var hash = sha256.ComputeHash(bytes);
+                return Convert.ToHexString(hash);
+            }
         }
     }
 }

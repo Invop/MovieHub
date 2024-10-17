@@ -41,11 +41,6 @@ namespace MovieHub.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            var rateRequest = new RateMovieRequest()
-            {
-                Rating = 5
-            };
-            await MovieService.RateMovie(Guid.Parse("a9ce762c-a7be-41c7-a200-4a2493348a77"), rateRequest);
             var request = new GetAllMoviesRequest
             {
                 Title = null,
