@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 
 namespace MovieHub.Services
@@ -15,22 +16,26 @@ namespace MovieHub.Services
         private readonly IHttpClientFactory _clientFactory;
         private readonly SecurityService _securityService;
         private readonly ILogger<TokenManager> _logger;
-        private string _cachedToken;
+        private readonly IDistributedCache _cache;
+        private const string CacheKey = "CachedToken";
 
-        public TokenManager(IHttpClientFactory clientFactory, SecurityService securityService, ILogger<TokenManager> logger)
+        public TokenManager(IHttpClientFactory clientFactory, SecurityService securityService,
+            ILogger<TokenManager> logger, IDistributedCache cache)
         {
             _clientFactory = clientFactory;
             _securityService = securityService;
             _logger = logger;
+            _cache = cache;
         }
 
         public async Task<string> GetTokenAsync()
         {
-            if (_cachedToken != null && IsTokenValid(_cachedToken))
+            var userCache = _securityService.User.GetHashCode();
+            var cachedToken = await _cache.GetStringAsync($"{CacheKey}:{userCache}");
+            if (!string.IsNullOrEmpty(cachedToken) && IsTokenValid(cachedToken))
             {
-                return _cachedToken;
+                return cachedToken;
             }
-
             if (!IsValidUserEmail())
             {
                 return null;
@@ -48,7 +53,11 @@ namespace MovieHub.Services
                 }
 
                 var token = await response.Content.ReadAsStringAsync();
-                _cachedToken = token;
+                var cacheOptions = new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(7)
+                };
+                await _cache.SetStringAsync($"{CacheKey}:{userCache}", token, cacheOptions);
                 return token;
             }
             catch (HttpRequestException e)
@@ -97,6 +106,5 @@ namespace MovieHub.Services
             var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
             return jwtToken?.ValidTo > DateTime.UtcNow;
         }
-
     }
 }

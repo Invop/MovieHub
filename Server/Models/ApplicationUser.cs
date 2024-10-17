@@ -31,7 +31,10 @@ namespace MovieHub.Models
                 UserName = value;
             }
         }
-
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(UserName, Email);
+        }
         public ICollection<ApplicationRole> Roles { get; set; }
     }
 }

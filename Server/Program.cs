@@ -62,6 +62,12 @@ builder.Services
 builder.Services.AddHttpClient("MovieApiClient",
     client => { client.BaseAddress = new Uri(builder.Configuration["MoviesApiBaseUrl"]!); });
 builder.Services.AddScoped<MovieService>();
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["ConnectionStrings:RedisConnection"]!;
+    options.InstanceName = "Webapp";
+});
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

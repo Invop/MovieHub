@@ -13,10 +13,6 @@ namespace MovieHub.Services
         private const string GenresEndpoint = "/api/genres";
         private readonly HttpClient _httpClient;
 
-        // Token Caching
-        private string? _cachedToken;
-        private DateTime _tokenExpirationTime;
-        
         public MovieService(IHttpClientFactory httpClientFactory, ITokenManager tokenManager)
         {
             _httpClientFactory = httpClientFactory;
@@ -26,12 +22,8 @@ namespace MovieHub.Services
 
         private async Task SetAuthorizationHeaderAsync()
         {
-            if (string.IsNullOrEmpty(_cachedToken) || DateTime.UtcNow >= _tokenExpirationTime)
-            {
-                _cachedToken = await _tokenManager.GetTokenAsync();
-                _tokenExpirationTime = DateTime.UtcNow.AddMinutes(5); // assuming token is valid for 5 minutes, adjust accordingly
-            }
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _cachedToken);
+            var cachedToken = await _tokenManager.GetTokenAsync();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cachedToken);
         }
 
         public async Task<MovieResponse?> GetMovie(string idOrSlug)
@@ -76,7 +68,7 @@ namespace MovieHub.Services
         public async Task RateMovie(Guid id, RateMovieRequest request)
         {
             await SetAuthorizationHeaderAsync();
-            var requestMessage = new HttpRequestMessage(HttpMethod.Put, $"{MovieEndpoint}/{id}/ratings") 
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, $"{MovieEndpoint}/{id}/ratings")
             {
                 Content = JsonContent.Create(request)
             };
