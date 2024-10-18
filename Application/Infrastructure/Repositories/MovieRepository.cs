@@ -66,12 +66,34 @@ public class MovieRepository : IMovieRepository
             .AsQueryable()
             .AsSplitQuery();
 
-        if (!string.IsNullOrEmpty(options.Title)) query = query.Where(m => m.Title.Contains(options.Title));
+        if (!string.IsNullOrEmpty(options.Title))
+            query = query.Where(m => EF.Functions.Like(m.Title, $"%{options.Title}%"));
 
-        if (options.YearOfRelease.HasValue) query = query.Where(m => m.YearOfRelease == options.YearOfRelease.Value);
+        if (options.YearOfRelease.HasValue) 
+            query = query.Where(m => m.YearOfRelease == options.YearOfRelease.Value);
 
         if (options.Genres != null && options.Genres.Any())
-            query = query.Where(m => m.Genres.Any(g => options.Genres.Contains(g.GenreId)));
+            query = query.Where(m =>
+                options.Genres.All(genreId => m.Genres.Any(g => g.GenreId == genreId)));
+        if (options is { MinRating: not null, MaxRating: not null })
+        {
+            query = query
+                .Where(m => m.Ratings.Any() &&
+                            m.Ratings.Average(r => r.Rating) >= options.MinRating.Value &&
+                            m.Ratings.Average(r => r.Rating) <= options.MaxRating.Value);
+        }
+        else if (options.MinRating.HasValue)
+        {
+            query = query
+                .Where(m => m.Ratings.Any() &&
+                            m.Ratings.Average(r => r.Rating) >= options.MinRating.Value);
+        }
+        else if (options.MaxRating.HasValue)
+        {
+            query = query
+                .Where(m => m.Ratings.Any() &&
+                            m.Ratings.Average(r => r.Rating) <= options.MaxRating.Value);
+        }
 
         switch (options.SortField)
         {
@@ -84,6 +106,11 @@ public class MovieRepository : IMovieRepository
                 query = options.SortOrder == SortOrder.Ascending
                     ? query.OrderBy(m => m.YearOfRelease)
                     : query.OrderByDescending(m => m.YearOfRelease);
+                break;
+            case "Rating":
+                query = options.SortOrder == SortOrder.Ascending
+                    ? query.OrderBy(m => m.Ratings.Average(r => r.Rating))
+                    : query.OrderByDescending(m => m.Ratings.Average(r => r.Rating));
                 break;
             default:
                 query = query.OrderBy(m => m.Title);
@@ -120,7 +147,7 @@ public class MovieRepository : IMovieRepository
 
     public async Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default)
     {
-        var movie = await _context.Movies.FindAsync(new object[] { id }, token);
+        var movie = await _context.Movies.FindAsync([id], token);
         if (movie == null) return false;
 
         _context.Movies.Remove(movie);

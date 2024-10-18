@@ -23,11 +23,11 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
         entity.HasKey(e => e.Id);
 
         entity.Property(e => e.Id).HasColumnName("id");
-        entity.Property(e => e.Slug).HasColumnName("slug").IsRequired();
-        entity.Property(e => e.Title).HasColumnName("title").IsRequired();
+        entity.Property(e => e.Slug).HasColumnName("slug").HasColumnType("text").IsRequired();
+        entity.Property(e => e.Title).HasColumnName("title").HasColumnType("text").IsRequired();
         entity.Property(e => e.YearOfRelease).HasColumnName("yearofrelease").IsRequired();
-        entity.Property(e => e.Overview).HasColumnName("overview").HasMaxLength(500);
-        entity.Property(e => e.PosterBase64).HasColumnName("poster_base64");
+        entity.Property(e => e.Overview).HasColumnName("overview").HasColumnType("text");;
+        entity.Property(e => e.PosterBase64).HasColumnName("poster_base64").HasColumnType("text");;
         entity.HasIndex(e => e.Slug)
             .IsUnique()
             .HasDatabaseName("movies_slug_idx");

@@ -1,3 +1,4 @@
+using Bogus;
 using Microsoft.EntityFrameworkCore;
 using MovieHub.Application.Models;
 using Newtonsoft.Json;
@@ -5,7 +6,8 @@ using Newtonsoft.Json;
 namespace MovieHub.Application.Data;
 
 public static class MoviesInitializer
-{
+{ 
+    private static Faker faker = new Faker();
     public static async Task Seed(MovieHubDbContext context, string filePath)
     {
         if (context.Movies.Any()) return;
@@ -41,6 +43,7 @@ public static class MoviesInitializer
                 YearOfRelease = movieSeed.YearOfRelease,
                 Slug = movieSeed.Slug,
                 PosterBase64 = movieSeed.PosterBase64,
+                Overview = movieSeed.Overview ?? faker.Lorem.Paragraphs(min:3,max:5),
             };
             movie.Genres = movieSeed.Genres.Select(genreName => new Genre
             {
@@ -48,6 +51,13 @@ public static class MoviesInitializer
                 GenreLookup = genreLookup[NormalizeGenre(genreName)]
             }).ToList();
 
+            movie.Ratings = new List<MovieRating>()
+            {
+                new()
+                {
+                    UserId = Guid.Empty,
+                }
+            };
             existingSlugs.Add(movieSeed.Slug);
             await context.Movies.AddAsync(movie);
         }
@@ -79,5 +89,6 @@ public static class MoviesInitializer
         public int YearOfRelease { get; set; }
         public List<string> Genres { get; set; }
         public string PosterBase64 { get; set; }
+        public string? Overview { get; set; }
     }
 }
