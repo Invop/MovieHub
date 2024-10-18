@@ -1,19 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Radzen;
 using Radzen.Blazor;
 
-namespace MovieHub.Components.Pages
+namespace MovieHub.Components.Pages.ApplicationUser
 {
     public partial class ApplicationUsers
     {
         [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        protected IJSRuntime JsRuntime { get; set; }
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
@@ -30,31 +25,31 @@ namespace MovieHub.Components.Pages
         [Inject]
         protected NotificationService NotificationService { get; set; }
 
-        protected IEnumerable<MovieHub.Models.ApplicationUser> users;
-        protected RadzenDataGrid<MovieHub.Models.ApplicationUser> grid0;
-        protected string error;
-        protected bool errorVisible;
+        protected IEnumerable<MovieHub.Models.ApplicationUser> Users;
+        protected RadzenDataGrid<MovieHub.Models.ApplicationUser> Grid0;
+        protected string Error;
+        protected bool ErrorVisible;
 
         [Inject]
         protected SecurityService Security { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            users = await Security.GetUsers();
+            Users = await Security.GetUsers();
         }
 
         protected async Task AddClick()
         {
             await DialogService.OpenAsync<AddApplicationUser>("Add Application User");
 
-            users = await Security.GetUsers();
+            Users = await Security.GetUsers();
         }
 
         protected async Task RowSelect(MovieHub.Models.ApplicationUser user)
         {
             await DialogService.OpenAsync<EditApplicationUser>("Edit Application User", new Dictionary<string, object>{ {"Id", user.Id} });
 
-            users = await Security.GetUsers();
+            Users = await Security.GetUsers();
         }
 
         protected async Task DeleteClick(MovieHub.Models.ApplicationUser user)
@@ -65,13 +60,13 @@ namespace MovieHub.Components.Pages
                 {
                     await Security.DeleteUser($"{user.Id}");
 
-                    users = await Security.GetUsers();
+                    Users = await Security.GetUsers();
                 }
             }
             catch (Exception ex)
             {
-                errorVisible = true;
-                error = ex.Message;
+                ErrorVisible = true;
+                Error = ex.Message;
             }
         }
     }

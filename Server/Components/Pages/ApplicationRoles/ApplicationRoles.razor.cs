@@ -1,19 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Radzen;
 using Radzen.Blazor;
 
-namespace MovieHub.Components.Pages
+namespace MovieHub.Components.Pages.ApplicationRoles
 {
     public partial class ApplicationRoles
     {
         [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        protected IJSRuntime JsRuntime { get; set; }
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
@@ -30,24 +25,24 @@ namespace MovieHub.Components.Pages
         [Inject]
         protected NotificationService NotificationService { get; set; }
 
-        protected IEnumerable<MovieHub.Models.ApplicationRole> roles;
-        protected RadzenDataGrid<MovieHub.Models.ApplicationRole> grid0;
-        protected string error;
-        protected bool errorVisible;
+        protected IEnumerable<MovieHub.Models.ApplicationRole> Roles;
+        protected RadzenDataGrid<MovieHub.Models.ApplicationRole> Grid0;
+        protected string Error;
+        protected bool ErrorVisible;
 
         [Inject]
         protected SecurityService Security { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            roles = await Security.GetRoles();
+            Roles = await Security.GetRoles();
         }
 
         protected async Task AddClick()
         {
             await DialogService.OpenAsync<AddApplicationRole>("Add Application Role");
 
-            roles = await Security.GetRoles();
+            Roles = await Security.GetRoles();
         }
 
         protected async Task DeleteClick(MovieHub.Models.ApplicationRole role)
@@ -58,13 +53,13 @@ namespace MovieHub.Components.Pages
                 {
                     await Security.DeleteRole($"{role.Id}");
 
-                    roles = await Security.GetRoles();
+                    Roles = await Security.GetRoles();
                 }
             }
             catch (Exception ex)
             {
-                errorVisible = true;
-                error = ex.Message;
+                ErrorVisible = true;
+                Error = ex.Message;
             }
         }
     }

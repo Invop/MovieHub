@@ -1,19 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Radzen;
-using Radzen.Blazor;
 
-namespace MovieHub.Components.Pages
+namespace MovieHub.Components.Pages.ApplicationUser
 {
-    public partial class AddApplicationUser
+    public partial class EditApplicationUser
     {
         [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        protected IJSRuntime JsRuntime { get; set; }
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
@@ -30,34 +24,39 @@ namespace MovieHub.Components.Pages
         [Inject]
         protected NotificationService NotificationService { get; set; }
 
-        protected IEnumerable<MovieHub.Models.ApplicationRole> roles;
-        protected MovieHub.Models.ApplicationUser user;
-        protected IEnumerable<string> userRoles = Enumerable.Empty<string>();
-        protected string error;
-        protected bool errorVisible;
+        protected IEnumerable<MovieHub.Models.ApplicationRole> Roles;
+        protected MovieHub.Models.ApplicationUser User;
+        protected IEnumerable<string> UserRoles;
+        protected string Error;
+        protected bool ErrorVisible;
+
+        [Parameter]
+        public string Id { get; set; }
 
         [Inject]
         protected SecurityService Security { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            user = new MovieHub.Models.ApplicationUser();
+            User = await Security.GetUserById($"{Id}");
 
-            roles = await Security.GetRoles();
+            UserRoles = User.Roles.Select(role => role.Id);
+
+            Roles = await Security.GetRoles();
         }
 
         protected async Task FormSubmit(MovieHub.Models.ApplicationUser user)
         {
             try
             {
-                user.Roles = roles.Where(role => userRoles.Contains(role.Id)).ToList();
-                await Security.CreateUser(user);
+                user.Roles = Roles.Where(role => UserRoles.Contains(role.Id)).ToList();
+                await Security.UpdateUser($"{Id}", user);
                 DialogService.Close(null);
             }
             catch (Exception ex)
             {
-                errorVisible = true;
-                error = ex.Message;
+                ErrorVisible = true;
+                Error = ex.Message;
             }
         }
 
