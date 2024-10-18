@@ -25,6 +25,8 @@ namespace MovieHub.Services
 
         public async Task<string> GetTokenAsync()
         {
+            if(!_securityService.IsAuthenticated())
+                return null;
             var userCache = GenerateUserCacheKey(_securityService.User.Email);
             var cachedToken = await _cache.GetStringAsync($"{CacheKey}:{userCache}");
             if (!string.IsNullOrEmpty(cachedToken) && IsTokenValid(cachedToken))
@@ -62,7 +64,7 @@ namespace MovieHub.Services
                 return null;
             }
         }
-
+        
         private bool IsValidUserEmail()
         {
             return !string.IsNullOrWhiteSpace(_securityService.User?.Email);
@@ -70,10 +72,8 @@ namespace MovieHub.Services
 
         private StringContent CreateRequestContent()
         {
-            bool isAdmin = _securityService.User.Roles?.Any(role =>
-                string.Equals(role.Name, "Admin", StringComparison.OrdinalIgnoreCase)) ?? false;
-            bool isTrustedMember = _securityService.User.Roles?.Any(role =>
-                string.Equals(role.Name, "Trusted_member", StringComparison.OrdinalIgnoreCase)) ?? false;
+            bool isAdmin = _securityService.IsAdministrator();
+            bool isTrustedMember = _securityService.IsTrustedMember();
 
             var request = new
             {

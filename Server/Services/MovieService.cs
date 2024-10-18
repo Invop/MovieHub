@@ -23,10 +23,11 @@ namespace MovieHub.Services
         private async Task SetAuthorizationHeaderAsync()
         {
             var cachedToken = await _tokenManager.GetTokenAsync();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cachedToken);
+            if (!string.IsNullOrEmpty(cachedToken))
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cachedToken);
         }
 
-        public async Task<MovieResponse?> GetMovie(string idOrSlug)
+        public async Task<MovieResponse> GetMovie(string idOrSlug)
         {
             await SetAuthorizationHeaderAsync();
             return await _httpClient.GetFromJsonAsync<MovieResponse>($"{MovieEndpoint}/{idOrSlug}");
@@ -81,19 +82,19 @@ namespace MovieHub.Services
             await _httpClient.DeleteAsync($"{MovieEndpoint}/{id}/ratings");
         }
 
-        public async Task<MovieRatingResponse[]?> GetUserRatings()
+        public async Task<MovieRatingResponse[]> GetUserRatings()
         {
             await SetAuthorizationHeaderAsync();
             return await _httpClient.GetFromJsonAsync<MovieRatingResponse[]>($"{MovieRatingsEndpoint}/me");
         }
 
-        public async Task<GenreResponse?> GetGenre(string idOrName)
+        public async Task<GenreResponse> GetGenre(string idOrName)
         {
             await SetAuthorizationHeaderAsync();
             return await _httpClient.GetFromJsonAsync<GenreResponse>($"{GenresEndpoint}/{idOrName}");
         }
 
-        public async Task<IEnumerable<GenreResponse>?> GetAllGenres()
+        public async Task<IEnumerable<GenreResponse>> GetAllGenres()
         {
             await SetAuthorizationHeaderAsync();
             return await _httpClient.GetFromJsonAsync<IEnumerable<GenreResponse>>(GenresEndpoint);

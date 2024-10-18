@@ -64,6 +64,30 @@ namespace MovieHub
             return roles.Any(role => Principal.IsInRole(role));
         }
 
+        public bool IsAdministrator()
+        {
+            #if DEBUG
+                        if (User.Name == "admin")
+                        {
+                            return true;
+                        }
+            #endif
+
+            return Principal?.IsInRole("Admin") ?? false;
+        }
+
+        public bool IsTrustedMember()
+        {
+            #if DEBUG
+                        if (User.Name == "admin")
+                        {
+                            return true;
+                        }
+            #endif
+
+            return Principal?.IsInRole("Trusted_member") ?? false;
+        }
+
         public bool IsAuthenticated()
         {
             return Principal?.Identity.IsAuthenticated == true;
