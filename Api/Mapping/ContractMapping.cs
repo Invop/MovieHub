@@ -94,6 +94,8 @@ public static class ContractMapping
             SortField = request.SortBy?.Trim('+', '-'),
             SortOrder = request.SortBy is null ? SortOrder.Unsorted :
                 request.SortBy.StartsWith('-') ? SortOrder.Descending : SortOrder.Ascending,
+            MinRating = request.MinRating,
+            MaxRating = request.MaxRating,
             Page = request.Page,
             PageSize = request.PageSize
         };

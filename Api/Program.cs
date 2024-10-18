@@ -75,7 +75,7 @@ builder.Services.AddSwaggerGen(x => x.OperationFilter<SwaggerDefaultValues>());
 
 
 
-builder.Services.AddDatabase(config["Database:ConnectionString"]!);
+builder.Services.AddDatabase(config["ConnectionStrings:DbConnection"]!);
 builder.Services.AddApplication();
 builder.Services.AddCors(options => 
 {
@@ -112,6 +112,6 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<MovieHubDbContext>();
     dbContext.Database.Migrate();
-    await MoviesInitializer.Seed(dbContext, "movies.json");
+    await MoviesInitializer.Seed(dbContext, "updated_movies.json");
 }
 app.Run();
