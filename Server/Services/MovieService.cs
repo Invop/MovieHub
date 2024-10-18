@@ -27,7 +27,7 @@ namespace MovieHub.Services
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cachedToken);
         }
 
-        public async Task<MovieResponse> GetMovie(string idOrSlug)
+        public async Task<MovieResponse> GetMovie(Guid idOrSlug)
         {
             await SetAuthorizationHeaderAsync();
             return await _httpClient.GetFromJsonAsync<MovieResponse>($"{MovieEndpoint}/{idOrSlug}");

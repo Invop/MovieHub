@@ -43,7 +43,7 @@ public static class MoviesInitializer
                 YearOfRelease = movieSeed.YearOfRelease,
                 Slug = movieSeed.Slug,
                 PosterBase64 = movieSeed.PosterBase64,
-                Overview = movieSeed.Overview ?? faker.Lorem.Paragraphs(min:3,max:5),
+                Overview = movieSeed.Overview ?? faker.Lorem.Paragraphs(min:1,max:2),
             };
             movie.Genres = movieSeed.Genres.Select(genreName => new Genre
             {

@@ -9,20 +9,89 @@
 
 <PageTitle>Movies-admin</PageTitle>
 <RadzenStack>
-    <RadzenRow AlignItems="AlignItems.Center">
-        <RadzenColumn Size="8" SizeMD="5">
-            <RadzenText Text="Movies" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0"/>
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="7">
-            <RadzenRow>
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                    <RadzenButton Click="@ClearSelection" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Info" Text="Clear Selection"/>
-                    <RadzenButton Icon="info" Text="Details" Disabled="@(_selectedMovie == null || !_selectedMovie.Any())" Click="@DetailsClick" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary"/>
-                    <RadzenButton Icon="autorenew" Text="Update" Disabled="@(_selectedMovie == null || !_selectedMovie.Any())" Click="@UpdateClick" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Warning"/>
-                    <RadzenButton Icon="delete" Text="Delete" Disabled="@(_selectedMovie == null || !_selectedMovie.Any())" Click="@DeleteClick" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Danger"/>
-                    <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddClick" Variant="Variant.Flat"/>
-                </RadzenStack>
-            </RadzenRow>
+    <RadzenColumn Size="12" SizeMD="5">
+        <RadzenText Text="Movies" TextStyle="TextStyle.H3" TagName="TagName.H1" class="rz-mb-0"/>
+    </RadzenColumn>
+    <RadzenRow AlignItems="AlignItems.Center"
+               
+               JustifyContent="JustifyContent.End">
+        <RadzenColumn Size="12">
+            <RadzenStack Gap="1rem" class="rz-mt-4 rz-mt-md-0">
+                <!-- Mobile view (stacked) -->
+                <div class="rz-display-md-none">
+                    <RadzenStack Gap="0.5rem">
+                        <RadzenButton Click="@ClearSelection"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Info"
+                                      Text="Clear Selection"
+                                      class="rz-w-100"/>
+                        <RadzenButton Icon="info"
+                                      Text="Details"
+                                      Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
+                                      Click="@DetailsClick"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Secondary"
+                                      class="rz-w-100"/>
+                        <RadzenButton Icon="autorenew"
+                                      Text="Update"
+                                      Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
+                                      Click="@UpdateClick"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Warning"
+                                      class="rz-w-100"/>
+                        <RadzenButton Icon="delete"
+                                      Text="Delete"
+                                      Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
+                                      Click="@DeleteClick"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      class="rz-w-100"/>
+                        <RadzenButton Icon="add_circle_outline"
+                                      Text="Add"
+                                      Click="@AddClick"
+                                      Variant="Variant.Flat"
+                                      class="rz-w-100"/>
+                    </RadzenStack>
+                </div>
+
+                <!-- Desktop view (horizontal) -->
+                <div class="rz-display-none rz-display-md-block">
+                    <RadzenStack Orientation="Orientation.Horizontal"
+                                 JustifyContent="JustifyContent.End"
+                                 Gap="0.5rem">
+                        <RadzenButton Click="@ClearSelection"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Info"
+                                      Text="Clear Selection"/>
+                        <RadzenButton Icon="info"
+                                      Text="Details"
+                                      Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
+                                      Style=" width: 150px; max-width: 150px;"
+                                      Click="@DetailsClick"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Secondary"/>
+                        <RadzenButton Icon="autorenew"
+                                      Text="Update"
+                                      Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
+                                      Style=" width: 150px; max-width: 150px;"
+                                      Click="@UpdateClick"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Warning"/>
+                        <RadzenButton Icon="delete"
+                                      Text="Delete"
+                                      Style=" width: 150px; max-width: 150px;"
+                                      Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
+                                      Click="@DeleteClick"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Danger"/>
+                        <RadzenButton Icon="add_circle_outline"
+                                      Style=" width: 150px; max-width: 150px;"
+                                      Text="Add"
+                                      Click="@AddClick"
+                                      Variant="Variant.Flat"/>
+                    </RadzenStack>
+                </div>
+            </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
     <RadzenRow>
@@ -37,7 +106,7 @@
                                 @ref="AdminMoviesGrid" SelectionMode="DataGridSelectionMode.Single"
                                 @bind-Value="@_selectedMovie"
                                 AllowPaging="true" AllowSorting="true" AllowFiltering="true"
-                                FilterMode="FilterMode.Simple" Count="@( _movies.Items.Any() ? _movies.Total : 0 )"
+                                FilterMode="FilterMode.Simple" Count="@(_movies.Items.Any() ? _movies.Total : 0)"
                                 IsLoading="IsLoading" LoadData="@LoadMoviesAsync" Data="@_movies.Items" ColumnWidth="100px">
                     <EmptyTemplate>
                         <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
@@ -64,14 +133,14 @@
                                               Sortable="true"
                                               TextAlign="TextAlign.Center" FilterValue="@(_yearValue)">
                             <FilterTemplate>
-                                <RadzenNumeric @bind-Value=_yearValue ShowUpDown=false Style="width:100%" />
+                                <RadzenNumeric @bind-Value=_yearValue ShowUpDown=false Style="width:100%"/>
                             </FilterTemplate>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn Property="Rating" Title="Rating" TextAlign="TextAlign.Center"
                                               FilterValue="@(_ratingMin)" SecondFilterValue="@(_ratingMax)">
                             <FilterTemplate>
-                                <RadzenNumeric @bind-Value=_ratingMin Min="0" Max="5" ShowUpDown="true" Style="width:50%" />
-                                <RadzenNumeric @bind-Value=_ratingMax Min="0" Max="5" ShowUpDown="true" Style="width:50%" />
+                                <RadzenNumeric @bind-Value=_ratingMin Min="0" Max="5" ShowUpDown="true" Style="width:50%"/>
+                                <RadzenNumeric @bind-Value=_ratingMax Min="0" Max="5" ShowUpDown="true" Style="width:50%"/>
                             </FilterTemplate>
                             <Template Context="data">
                                 @{

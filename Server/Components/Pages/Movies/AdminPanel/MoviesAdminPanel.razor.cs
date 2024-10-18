@@ -73,7 +73,7 @@ public partial class MoviesAdminPanel
         }
 
         IsLoading = true;
-    
+
         string formattedSort = string.Empty;
         var sort = args.Sorts.FirstOrDefault();
         if (sort != null)
@@ -113,21 +113,22 @@ public partial class MoviesAdminPanel
         }
     }
 
+    private MovieResponse GetSelectedMovie()
+    {
+        return _selectedMovie?.FirstOrDefault();
+    }
+
     private async Task DeleteClick()
     {
         try
         {
-            MovieResponse movieToDelete = default;
-            if (_selectedMovie?.Count > 0)
-            {
-                movieToDelete = _selectedMovie.First();
-            }
+            var movieToDelete = GetSelectedMovie();
+            if (movieToDelete == null) return;
 
             if (await DialogService.Confirm($"Are you sure you want to delete this movie({movieToDelete?.Title})?") ==
                 true)
             {
-                if (movieToDelete != null)
-                    await MovieService.DeleteMovie(movieToDelete.Id);
+                await MovieService.DeleteMovie(movieToDelete.Id);
                 var movieRequest = new GetAllMoviesRequest()
                 {
                     Page = AdminMoviesGrid.CurrentPage + 1,
@@ -139,9 +140,9 @@ public partial class MoviesAdminPanel
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "An error occurred while trying to delete the role.");
+            Logger.LogError(ex, "An error occurred while trying to delete the movie.");
             ErrorVisible = true;
-            Error = ex.Message;
+            Error = "An error occurred while trying to delete the movie.";
         }
     }
 
@@ -154,12 +155,19 @@ public partial class MoviesAdminPanel
         {
             Logger.LogError(ex, "An error occurred while trying to delete the role.");
             ErrorVisible = true;
-            Error = ex.Message;
+            Error = "An error occurred while trying to update the role.";
         }
     }
 
-    private void DetailsClick()
+    private async Task DetailsClick()
     {
+        var movieToRead = GetSelectedMovie();
+        if (movieToRead == null) return;
+        await DialogService.OpenAsync<MovieDetails>("Movie Details", new Dictionary<string, object> { { "Id", movieToRead.Id } },
+        new DialogOptions() 
+        {
+            Width = "800px", 
+        });
     }
 
     private void ClearSelection()

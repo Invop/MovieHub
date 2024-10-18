@@ -1,0 +1,102 @@
+@page "/movie/{Id}"
+
+<div class="rz-p-4" >
+    <RadzenCard class="rz-shadow-10 rz-p-6 rz-m-4 rz-border-radius-2">
+        @if (_isLoading)
+        {
+            <div class="rz-text-align-center rz-p-12">
+                <RadzenProgressBarCircular 
+                    ProgressBarStyle="ProgressBarStyle.Primary"
+                    Value="100" 
+                    ShowValue="false" 
+                    Mode="ProgressBarMode.Indeterminate"
+                    Style="width: 60px; height: 60px;"/>
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4">Loading movie details...</RadzenText>
+            </div>
+        }
+        else
+        {
+            <RadzenRow class="rz-gap-4">
+                <RadzenColumn Size="12" SizeMD="6">
+                    <div class="rz-d-flex rz-flex-column">
+                        <div class="rz-background-color-base-100 rz-border-radius-2 rz-p-4 rz-shadow-3">
+                            @if (!string.IsNullOrEmpty(_movieData.PosterBase64))
+                            {
+                                <RadzenImage Path="@($"data:image/jpeg;base64,{_movieData.PosterBase64}")"
+                                            Style="width: 100%; border-radius: 4px;"
+                                            AlternateText="@($"{_movieData.Title} poster image")"/>
+                            }
+                            else
+                            {
+                                <div class="rz-background-color-base-200 rz-border-radius-2 rz-p-8 rz-text-align-center">
+                                    <RadzenIcon Icon="movie" Style="width: 80px; height: 80px; color: var(--rz-text-disabled-color);"/>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="rz-mt-4 rz-text-align-center">
+                            <RadzenRating Value="@((int)(_movieData.Rating ?? 0f))" 
+                                        ReadOnly="true"
+                                        Style="color: var(--rz-warning); font-size: 1.5rem;"/>
+                            
+                            @if (_movieData.UserRating.HasValue)
+                            {
+                                <div class="rz-mt-2 rz-p-3 rz-background-color-success-lighter rz-border-radius-1">
+                                    <RadzenText TextStyle="TextStyle.Subtitle2">Your Rating</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">
+                                        @_movieData.UserRating.Value
+                                    </RadzenText>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </RadzenColumn>
+
+                <RadzenColumn Size="12" SizeMD="6">
+                    <div class="rz-p-4">
+                        <RadzenText TextStyle="TextStyle.H3" class="rz-mb-2">
+                            @_movieData.Title
+                        </RadzenText>
+                        
+                        <div class="rz-d-flex rz-align-items-center rz-mt-2">
+                            <RadzenText TextStyle="TextStyle.H6" class="rz-text-secondary rz-mb-0">
+                                @_movieData.YearOfRelease
+                            </RadzenText>
+                            
+                            <div class="">
+                                @foreach (var genre in _movieData.Genres)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary"
+                                                Text="@genre"
+                                                class="rz-m-1 rz-px-3 rz-py-2"/>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <!-- Second Row - Overview -->
+            <RadzenRow class="rz-mt-6">
+                <RadzenColumn Size="12">
+                    <div class="rz-background-color-base-100 rz-p-6 rz-border-radius-2">
+                        <RadzenText TextStyle="TextStyle.H5" class="rz-mb-3">Overview</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1">
+                            @_movieData.Overview
+                        </RadzenText>
+                    </div>
+                </RadzenColumn>
+            </RadzenRow>
+
+            @if (ShowClose)
+            {
+                <div class="rz-mt-6 rz-pt-4 rz-text-align-right">
+                    <RadzenButton Click="@((args) => DialogService.Close(true))"
+                                ButtonStyle="ButtonStyle.Secondary"
+                                Text="Close"
+                                class="rz-px-6"/>
+                </div>
+            }
+        }
+    </RadzenCard>
+</div>
