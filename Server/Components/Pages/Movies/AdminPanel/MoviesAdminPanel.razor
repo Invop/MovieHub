@@ -1,0 +1,91 @@
+@page "/movies-admin"
+@using MovieHub.Contracts.Responses
+@attribute [Authorize]
+
+@if (!Security.IsAdministrator())
+{
+    <Unauthorized/>
+}
+
+<PageTitle>Movies-admin</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="8" SizeMD="5">
+            <RadzenText Text="Movies" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0"/>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="7">
+            <RadzenRow>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton Click="@ClearSelection" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Info" Text="Clear Selection"/>
+                    <RadzenButton Icon="info" Text="Details" Disabled="@(_selectedMovie == null || !_selectedMovie.Any())" Click="@DetailsClick" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary"/>
+                    <RadzenButton Icon="autorenew" Text="Update" Disabled="@(_selectedMovie == null || !_selectedMovie.Any())" Click="@UpdateClick" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Warning"/>
+                    <RadzenButton Icon="delete" Text="Delete" Disabled="@(_selectedMovie == null || !_selectedMovie.Any())" Click="@DeleteClick" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Danger"/>
+                    <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddClick" Variant="Variant.Flat"/>
+                </RadzenStack>
+            </RadzenRow>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD="12">
+            @if (ErrorVisible)
+            {
+                <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Cannot delete movie">@Error</RadzenAlert>
+            }
+            @if (_movies != null && _genres != null)
+            {
+                <RadzenDataGrid PageSizeOptions="@( [5, 15, 25])" PageSize="15" ShowPagingSummary="true"
+                                @ref="AdminMoviesGrid" SelectionMode="DataGridSelectionMode.Single"
+                                @bind-Value="@_selectedMovie"
+                                AllowPaging="true" AllowSorting="true" AllowFiltering="true"
+                                FilterMode="FilterMode.Simple" Count="@( _movies.Items.Any() ? _movies.Total : 0 )"
+                                IsLoading="IsLoading" LoadData="@LoadMoviesAsync" Data="@_movies.Items" ColumnWidth="100px">
+                    <EmptyTemplate>
+                        <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
+                    </EmptyTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn Property="Title" Title="Title" FilterValue="@(_titleValue)">
+                            <FilterTemplate>
+                                <RadzenTextBox @bind-Value="@(_titleValue)" Style="width: 100%"/>
+                            </FilterTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="Slug" Title="Slug" Sortable="false" Filterable="false"/>
+                        <RadzenDataGridColumn Property="Genres" Title="Genres" Sortable="false" Filterable="true">
+                            <FilterTemplate>
+                                <RadzenDropDown @bind-Value=@_selectedGenres Data="@(_genres.Items)" Style="width:100%;"
+                                                ValueProperty="Id" TextProperty="Name" AllowClear="true" Multiple="true"
+                                                Chips=true SelectAllText="Select all items" MaxSelectedLabels="2"
+                                                Change=@OnSelectedGenresChange/>
+                            </FilterTemplate>
+                            <Template Context="data">
+                                <RadzenText TextStyle="TextStyle.Body1">@(string.Join("; ", data.Genres.Take(2)))</RadzenText>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="YearOfRelease" Title="Year of Release" 
+                                              TextAlign="TextAlign.Center" FilterValue="@(_yearValue)">
+                            <FilterTemplate>
+                                <RadzenNumeric @bind-Value=_yearValue ShowUpDown=false Style="width:100%" />
+                            </FilterTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="Rating" Title="Rating" TextAlign="TextAlign.Center"
+                                              FilterValue="@(_ratingMin)" SecondFilterValue="@(_ratingMax)">
+                            <FilterTemplate>
+                                <RadzenNumeric @bind-Value=_ratingMin Min="0" Max="5" ShowUpDown="true" Style="width:50%" />
+                                <RadzenNumeric @bind-Value=_ratingMax Min="0" Max="5" ShowUpDown="true" Style="width:50%" />
+                            </FilterTemplate>
+                            <Template Context="data">
+                                @{
+                                    int movieRating = data.Rating.HasValue ? (int)data.Rating.Value : 0;
+                                }
+                                <RadzenRating @bind-Value=@movieRating ReadOnly="true"/>
+                            </Template>
+                        </RadzenDataGridColumn>
+
+                    </Columns>
+
+
+                </RadzenDataGrid>
+            }
+
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>

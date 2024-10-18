@@ -36,7 +36,7 @@ namespace MovieHub.Services
         public async Task<MoviesResponse> GetMovies(GetAllMoviesRequest request)
         {
             await SetAuthorizationHeaderAsync();
-            var queryString = BuildQueryString(request);
+            var queryString = BuildGetAllMoviesQueryString(request);
             return await _httpClient.GetFromJsonAsync<MoviesResponse>(MovieEndpoint + queryString);
         }
 
@@ -94,10 +94,10 @@ namespace MovieHub.Services
             return await _httpClient.GetFromJsonAsync<GenreResponse>($"{GenresEndpoint}/{idOrName}");
         }
 
-        public async Task<IEnumerable<GenreResponse>> GetAllGenres()
+        public async Task<GenresResponse> GetAllGenres()
         {
             await SetAuthorizationHeaderAsync();
-            return await _httpClient.GetFromJsonAsync<IEnumerable<GenreResponse>>(GenresEndpoint);
+            return await _httpClient.GetFromJsonAsync<GenresResponse>(GenresEndpoint);
         }
 
         public async Task CreateGenre(CreateGenreRequest request)
@@ -126,7 +126,7 @@ namespace MovieHub.Services
             await _httpClient.DeleteAsync($"{GenresEndpoint}/{id}");
         }
 
-        private string BuildQueryString(GetAllMoviesRequest request)
+        private string BuildGetAllMoviesQueryString(GetAllMoviesRequest request)
         {
             var queryParams = new List<string>();
 
@@ -138,6 +138,21 @@ namespace MovieHub.Services
             if (request.Year.HasValue)
             {
                 queryParams.Add($"year={request.Year}");
+            }
+
+            if (request.MinRating.HasValue)
+            {
+                queryParams.Add($"minRating={request.MinRating}");
+            }
+
+            if (request.MaxRating.HasValue)
+            {
+                queryParams.Add($"maxRating={request.MaxRating}");
+            }
+
+            if (request.GenreIds != null && request.GenreIds.Any())
+            {
+                queryParams.AddRange(request.GenreIds.Select(genreId => $"genreIds={genreId}"));
             }
 
             queryParams.Add($"page={request.Page}");

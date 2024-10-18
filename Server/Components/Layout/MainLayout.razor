@@ -21,6 +21,7 @@
                             {
                                 <RadzenProfileMenuItem Path="application-users" Icon="person" Text="Users"/>
                                 <RadzenProfileMenuItem Path="application-roles" Icon="security" Text="Roles"/>
+                                <RadzenProfileMenuItem Path="movies-admin" Icon="dashboard" Text="Movies"/>
                             }
                             <RadzenProfileMenuItem Text="Logout" Value="Logout" Icon="power_settings_new"/>
                         </ChildContent>
@@ -48,6 +49,8 @@
         </RadzenStack>
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Home" Path=""/>
+            <RadzenPanelMenuItem Text="Browse Movies by Genre"/> 
+            <RadzenPanelMenuItem Text="Most Popular Movies"/>
         </RadzenPanelMenu>
         <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding);">
             <RadzenText Text="MovieHub v1.0.0" TextStyle="Radzen.Blazor.TextStyle.Caption" TagName="Radzen.Blazor.TagName.P" TextAlign="Radzen.TextAlign.Center"/>
