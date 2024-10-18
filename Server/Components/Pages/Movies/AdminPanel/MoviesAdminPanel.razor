@@ -17,7 +17,7 @@
             <RadzenRow>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
                     <RadzenButton Click="@ClearSelection" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Info" Text="Clear Selection"/>
-                    <RadzenButton Icon="info" Text="Details" Disabled="@(_selectedMovie == null || !_selectedMovie.Any())" Click="@DetailsClick" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary"/>
+                    <RadzenButton Icon="info" Text="Details" Disabled="@(_selectedMovie == null || !_selectedMovie.Any())" Click="@DetailsClick" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary"/>
                     <RadzenButton Icon="autorenew" Text="Update" Disabled="@(_selectedMovie == null || !_selectedMovie.Any())" Click="@UpdateClick" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Warning"/>
                     <RadzenButton Icon="delete" Text="Delete" Disabled="@(_selectedMovie == null || !_selectedMovie.Any())" Click="@DeleteClick" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Danger"/>
                     <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddClick" Variant="Variant.Flat"/>
