@@ -10,7 +10,7 @@ using Radzen.Blazor;
 
 namespace MovieHub.Components.Pages.Movies.AdminPanel;
 
-public partial class MoviesAdminPanel : ComponentBase
+public partial class MoviesAdminPanel
 {
     [Inject] protected IJSRuntime JsRuntime { get; set; }
 
@@ -43,6 +43,7 @@ public partial class MoviesAdminPanel : ComponentBase
     private int? _yearValue;
     private int? _ratingMin;
     private int? _ratingMax;
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -72,6 +73,14 @@ public partial class MoviesAdminPanel : ComponentBase
         }
 
         IsLoading = true;
+    
+        string formattedSort = string.Empty;
+        var sort = args.Sorts.FirstOrDefault();
+        if (sort != null)
+        {
+            formattedSort = $"{(sort.SortOrder == SortOrder.Ascending ? "+" : "-")}{sort.Property}";
+        }
+
         var movieRequest = new GetAllMoviesRequest()
         {
             Page = AdminMoviesGrid.CurrentPage + 1,
@@ -80,9 +89,12 @@ public partial class MoviesAdminPanel : ComponentBase
             GenreIds = _selectedGenres,
             Year = _yearValue,
             MinRating = _ratingMin,
-            MaxRating = _ratingMax
+            MaxRating = _ratingMax,
+            SortBy = formattedSort
         };
+
         _movies = await MovieService.GetMovies(movieRequest);
+
         IsLoading = false;
     }
 
@@ -110,10 +122,11 @@ public partial class MoviesAdminPanel : ComponentBase
             {
                 movieToDelete = _selectedMovie.First();
             }
+
             if (await DialogService.Confirm($"Are you sure you want to delete this movie({movieToDelete?.Title})?") ==
                 true)
             {
-                if (movieToDelete != null) 
+                if (movieToDelete != null)
                     await MovieService.DeleteMovie(movieToDelete.Id);
                 var movieRequest = new GetAllMoviesRequest()
                 {
@@ -136,7 +149,6 @@ public partial class MoviesAdminPanel : ComponentBase
     {
         try
         {
-
         }
         catch (Exception ex)
         {
@@ -154,12 +166,12 @@ public partial class MoviesAdminPanel : ComponentBase
     {
         _selectedMovie = null;
     }
-    
+
     private void OnSelectedGenresChange(object value)
     {
         if (_selectedGenres != null && !_selectedGenres.Any())
         {
-            _selectedGenres = null;  
+            _selectedGenres = null;
         }
     }
 
@@ -170,6 +182,7 @@ public partial class MoviesAdminPanel : ComponentBase
         {
             return true;
         }
+
         if (!(_ratingMin > _ratingMax)) return true;
         Error = "Minimum rating cannot be greater than maximum rating.";
         ErrorVisible = true;

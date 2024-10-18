@@ -7,7 +7,7 @@ public class GetAllMoviesOptionsValidator : AbstractValidator<GetAllMoviesOption
 {
     private static readonly string[] AcceptableSortFields =
     {
-        "title", "yearofrelease"
+        "title", "yearofrelease","rating"
     };
 
     public GetAllMoviesOptionsValidator()

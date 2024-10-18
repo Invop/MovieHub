@@ -60,7 +60,8 @@
                                 <RadzenText TextStyle="TextStyle.Body1">@(string.Join("; ", data.Genres.Take(2)))</RadzenText>
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="YearOfRelease" Title="Year of Release" 
+                        <RadzenDataGridColumn Property="YearOfRelease" Title="Year of Release"
+                                              Sortable="true"
                                               TextAlign="TextAlign.Center" FilterValue="@(_yearValue)">
                             <FilterTemplate>
                                 <RadzenNumeric @bind-Value=_yearValue ShowUpDown=false Style="width:100%" />
@@ -79,7 +80,6 @@
                                 <RadzenRating @bind-Value=@movieRating ReadOnly="true"/>
                             </Template>
                         </RadzenDataGridColumn>
-
                     </Columns>
 
 

@@ -160,7 +160,7 @@ namespace MovieHub.Services
 
             if (!string.IsNullOrEmpty(request.SortBy))
             {
-                queryParams.Add($"sortBy={request.SortBy}");
+                queryParams.Add($"sortBy={Uri.EscapeDataString(request.SortBy)}");
             }
 
             return "?" + string.Join("&", queryParams);
