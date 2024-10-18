@@ -49,5 +49,18 @@ namespace MovieHub.Components.Layout
                 Security.Logout();
             }
         }
+        
+        private void OnLoginClick()
+        {
+            var redirectUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+            if (!string.IsNullOrEmpty(redirectUrl))
+            {
+                NavigationManager.NavigateTo($"Login?redirectUrl={Uri.EscapeDataString(redirectUrl)}", true);
+            }
+            else
+            {
+                NavigationManager.NavigateTo("Login", true);
+            }
+        }
     }
 }

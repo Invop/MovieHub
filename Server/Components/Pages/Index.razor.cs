@@ -37,25 +37,6 @@ namespace MovieHub.Components.Pages
         [Inject]
         protected ILogger<Index> Logger { get; set; } // Inject the logger
 
-        private string Token { get; set; }
 
-        protected override async Task OnInitializedAsync()
-        {
-            var request = new GetAllMoviesRequest
-            {
-                Title = null,
-                Year = null,
-                SortBy = null,
-                Page = 1,
-                PageSize = 3
-            };
-
-            var movies = await MovieService.GetMovies(request);
-            
-            foreach (var movie in movies.Items)
-            {
-                Logger.LogInformation("Movie Title: {Title}, Id: {Id}, Rating: {Rating}", movie.Title,movie.Id, movie.Rating);
-            }
-        }
     }
 }
