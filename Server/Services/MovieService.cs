@@ -1,6 +1,10 @@
+using Newtonsoft.Json;
 using MovieHub.Contracts.Requests;
 using MovieHub.Contracts.Responses;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace MovieHub.Services
 {
@@ -8,15 +12,17 @@ namespace MovieHub.Services
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ITokenManager _tokenManager;
+        private readonly ILogger<MovieService> _logger;
         private const string MovieEndpoint = "/api/movies";
         private const string MovieRatingsEndpoint = "/api/ratings";
         private const string GenresEndpoint = "/api/genres";
         private readonly HttpClient _httpClient;
 
-        public MovieService(IHttpClientFactory httpClientFactory, ITokenManager tokenManager)
+        public MovieService(IHttpClientFactory httpClientFactory, ITokenManager tokenManager, ILogger<MovieService> logger)
         {
             _httpClientFactory = httpClientFactory;
             _tokenManager = tokenManager;
+            _logger = logger;
             _httpClient = httpClientFactory.CreateClient("MovieApiClient");
         }
 
@@ -27,103 +33,191 @@ namespace MovieHub.Services
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cachedToken);
         }
 
-        public async Task<MovieResponse> GetMovie(Guid idOrSlug)
+        public async Task<ServiceResponse<MovieResponse>> GetMovie(Guid idOrSlug)
         {
             await SetAuthorizationHeaderAsync();
-            return await _httpClient.GetFromJsonAsync<MovieResponse>($"{MovieEndpoint}/{idOrSlug}");
+            var response = await _httpClient.GetAsync($"{MovieEndpoint}/{idOrSlug}");
+
+            var errorMessage = await LogIfError(response, $"Failed to get movie {idOrSlug}");
+            var data = errorMessage == null ? await response.Content.ReadFromJsonAsync<MovieResponse>() : null;
+
+            return new ServiceResponse<MovieResponse> { Data = data, ErrorMessage = errorMessage };
         }
 
-        public async Task<MoviesResponse> GetMovies(GetAllMoviesRequest request)
+        public async Task<ServiceResponse<MoviesResponse>> GetMovies(GetAllMoviesRequest request)
         {
             await SetAuthorizationHeaderAsync();
             var queryString = BuildGetAllMoviesQueryString(request);
-            return await _httpClient.GetFromJsonAsync<MoviesResponse>(MovieEndpoint + queryString);
+            var response = await _httpClient.GetAsync(MovieEndpoint + queryString);
+
+            var errorMessage = await LogIfError(response, $"Failed to get movies with request {request}");
+            var data = errorMessage == null ? await response.Content.ReadFromJsonAsync<MoviesResponse>() : null;
+
+            return new ServiceResponse<MoviesResponse> { Data = data, ErrorMessage = errorMessage };
         }
 
-        public async Task CreateMovie(CreateMovieRequest request)
+        public async Task<ServiceResponse<bool>> CreateMovie(CreateMovieRequest request)
         {
             await SetAuthorizationHeaderAsync();
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, MovieEndpoint)
             {
                 Content = JsonContent.Create(request)
             };
-            await _httpClient.SendAsync(requestMessage);
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            var errorMessage = await LogIfError(response, $"Failed to create movie with request {request}");
+            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
         }
 
-        public async Task UpdateMovie(Guid id, UpdateMovieRequest request)
+        public async Task<ServiceResponse<bool>> UpdateMovie(Guid id, UpdateMovieRequest request)
         {
             await SetAuthorizationHeaderAsync();
             var requestMessage = new HttpRequestMessage(HttpMethod.Put, $"{MovieEndpoint}/{id}")
             {
                 Content = JsonContent.Create(request)
             };
-            await _httpClient.SendAsync(requestMessage);
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            var errorMessage = await LogIfError(response, $"Failed to update movie {id} with request {request}");
+            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
         }
 
-        public async Task DeleteMovie(Guid id)
+        public async Task<ServiceResponse<bool>> DeleteMovie(Guid id)
         {
             await SetAuthorizationHeaderAsync();
-            await _httpClient.DeleteAsync($"{MovieEndpoint}/{id}");
+            var response = await _httpClient.DeleteAsync($"{MovieEndpoint}/{id}");
+
+            var errorMessage = await LogIfError(response, $"Failed to delete movie {id}");
+            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
         }
 
-        public async Task RateMovie(Guid id, RateMovieRequest request)
+        public async Task<ServiceResponse<bool>> RateMovie(Guid id, RateMovieRequest request)
         {
             await SetAuthorizationHeaderAsync();
             var requestMessage = new HttpRequestMessage(HttpMethod.Put, $"{MovieEndpoint}/{id}/ratings")
             {
                 Content = JsonContent.Create(request)
             };
-            await _httpClient.SendAsync(requestMessage);
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            var errorMessage = await LogIfError(response, $"Failed to rate movie {id} with request {request}");
+            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
         }
 
-        public async Task DeleteRating(Guid id)
+        public async Task<ServiceResponse<bool>> DeleteRating(Guid id)
         {
             await SetAuthorizationHeaderAsync();
-            await _httpClient.DeleteAsync($"{MovieEndpoint}/{id}/ratings");
+            var response = await _httpClient.DeleteAsync($"{MovieEndpoint}/{id}/ratings");
+
+            var errorMessage = await LogIfError(response, $"Failed to delete rating for movie {id}");
+            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
         }
 
-        public async Task<MovieRatingResponse[]> GetUserRatings()
+        public async Task<ServiceResponse<MovieRatingResponse[]>> GetUserRatings()
         {
             await SetAuthorizationHeaderAsync();
-            return await _httpClient.GetFromJsonAsync<MovieRatingResponse[]>($"{MovieRatingsEndpoint}/me");
+            var response = await _httpClient.GetAsync($"{MovieRatingsEndpoint}/me");
+
+            var errorMessage = await LogIfError(response, "Failed to get user ratings");
+            var data = errorMessage == null ? await response.Content.ReadFromJsonAsync<MovieRatingResponse[]>() : null;
+
+            return new ServiceResponse<MovieRatingResponse[]> { Data = data, ErrorMessage = errorMessage };
         }
 
-        public async Task<GenreResponse> GetGenre(string idOrName)
+        public async Task<ServiceResponse<GenreResponse>> GetGenre(string idOrName)
         {
             await SetAuthorizationHeaderAsync();
-            return await _httpClient.GetFromJsonAsync<GenreResponse>($"{GenresEndpoint}/{idOrName}");
+            var response = await _httpClient.GetAsync($"{GenresEndpoint}/{idOrName}");
+
+            var errorMessage = await LogIfError(response, $"Failed to get genre {idOrName}");
+            var data = errorMessage == null ? await response.Content.ReadFromJsonAsync<GenreResponse>() : null;
+
+            return new ServiceResponse<GenreResponse> { Data = data, ErrorMessage = errorMessage };
         }
 
-        public async Task<GenresResponse> GetAllGenres()
+        public async Task<ServiceResponse<GenresResponse>> GetAllGenresAsync()
         {
             await SetAuthorizationHeaderAsync();
-            return await _httpClient.GetFromJsonAsync<GenresResponse>(GenresEndpoint);
+            var response = await _httpClient.GetAsync(GenresEndpoint);
+
+            var errorMessage = await LogIfError(response, "Failed to get all genres");
+            var data = errorMessage == null ? await response.Content.ReadFromJsonAsync<GenresResponse>() : null;
+
+            return new ServiceResponse<GenresResponse> { Data = data, ErrorMessage = errorMessage };
         }
 
-        public async Task CreateGenre(CreateGenreRequest request)
+        public async Task<ServiceResponse<bool>> CreateGenre(CreateGenreRequest request)
         {
             await SetAuthorizationHeaderAsync();
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, GenresEndpoint)
             {
                 Content = JsonContent.Create(request)
             };
-            await _httpClient.SendAsync(requestMessage);
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            var errorMessage = await LogIfError(response, $"Failed to create genre with request {request}");
+            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
         }
 
-        public async Task UpdateGenre(int id, UpdateGenreRequest request)
+        public async Task<ServiceResponse<bool>> UpdateGenre(int id, UpdateGenreRequest request)
         {
             await SetAuthorizationHeaderAsync();
             var requestMessage = new HttpRequestMessage(HttpMethod.Put, $"{GenresEndpoint}/{id}")
             {
                 Content = JsonContent.Create(request)
             };
-            await _httpClient.SendAsync(requestMessage);
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            var errorMessage = await LogIfError(response, $"Failed to update genre {id} with request {request}");
+            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
         }
 
-        public async Task DeleteGenre(int id)
+        public async Task<ServiceResponse<bool>> DeleteGenre(int id)
         {
             await SetAuthorizationHeaderAsync();
-            await _httpClient.DeleteAsync($"{GenresEndpoint}/{id}");
+            var response = await _httpClient.DeleteAsync($"{GenresEndpoint}/{id}");
+
+            var errorMessage = await LogIfError(response, $"Failed to delete genre {id}");
+            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
+        }
+
+        private async Task<string> LogIfError(HttpResponseMessage response, string message)
+        {
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var errorMessage = new StringBuilder();
+
+                try
+                {
+                    var validationFailureResponse = JsonConvert.DeserializeObject<ValidationFailureResponse>(responseContent);
+
+                    if (validationFailureResponse != null)
+                    {
+                        foreach (var error in validationFailureResponse.Errors)
+                        {
+                            var logMessage = $"Error: {error.Message}";
+                            _logger.LogError($"{message}, Status Code: {response.StatusCode}, {logMessage}");
+                            errorMessage.AppendLine(logMessage);
+                        }
+                    }
+                    else
+                    {
+                        var logMessage = "No validation errors returned.";
+                        _logger.LogError($"{message}, Status Code: {response.StatusCode}, {logMessage}");
+                        errorMessage.AppendLine(logMessage);
+                    }
+                }
+                catch (JsonException ex)
+                {
+                    _logger.LogError($"{message}, Status Code: {response.StatusCode}, Response: {responseContent}");
+                    _logger.LogError(ex, "Failed to deserialize validation error response.");
+                }
+
+                return errorMessage.ToString();
+            }
+
+            return null;
         }
 
         private string BuildGetAllMoviesQueryString(GetAllMoviesRequest request)
@@ -165,5 +259,12 @@ namespace MovieHub.Services
 
             return "?" + string.Join("&", queryParams);
         }
+    }
+    public class ServiceResponse<T>
+    {
+        public T Data { get; set; }
+        public string ErrorMessage { get; set; }
+
+        public bool IsSuccess => string.IsNullOrEmpty(ErrorMessage);
     }
 }
