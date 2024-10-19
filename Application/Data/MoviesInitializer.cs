@@ -11,7 +11,7 @@ public static class MoviesInitializer
     public static async Task Seed(MovieHubDbContext context, string filePath)
     {
         if (context.Movies.Any()) return;
-        var jsonData = File.ReadAllText(filePath);
+        var jsonData = await File.ReadAllTextAsync(filePath);
         var movies = JsonConvert.DeserializeObject<List<MovieWithGenres>>(jsonData);
         var allGenres = movies!
             .SelectMany(m => m.Genres)
