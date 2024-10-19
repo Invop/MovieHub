@@ -35,8 +35,11 @@ public static class ContractMapping
         };
     }
 
-    public static Movie MapToMovie(this UpdateMovieRequest request, Guid id)
+    public static async Task<Movie> MapToMovie(this UpdateMovieRequest request, Guid id,IGenreService genreService)
     {
+        var allGenres = await genreService.GetAllGenresAsync();
+        var selectedGenres = allGenres
+            .Where(gl => request.Genres.Contains(gl.Id));
         return new Movie
         {
             Id = id,
@@ -44,8 +47,13 @@ public static class ContractMapping
             YearOfRelease = request.YearOfRelease,
             Overview = request.Overview,
             PosterBase64 = request.PosterBase64,
-            Genres = request.Genres
-                .Select(genreId => new Genre { GenreId = genreId, MovieId = id })
+            Genres = selectedGenres
+                .Select(genre => new Genre 
+                { 
+                    GenreId = genre.Id, 
+                    MovieId = id,
+                    GenreLookup = genre
+                })
                 .ToList()
         };
     }

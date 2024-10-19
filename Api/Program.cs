@@ -112,6 +112,6 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<MovieHubDbContext>();
     dbContext.Database.Migrate();
-    await MoviesInitializer.Seed(dbContext, "updated_movies.json");
+    await MoviesInitializer.Seed(dbContext, "filtered_movies.json");
 }
 app.Run();

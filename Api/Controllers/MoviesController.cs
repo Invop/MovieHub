@@ -83,7 +83,7 @@ public class MoviesController : ControllerBase
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateMovieRequest request,
         CancellationToken token)
     {
-        var movie = request.MapToMovie(id);
+        var movie = await request.MapToMovie(id,_genreService);
         var userId = HttpContext.GetUserId();
         var updatedMovie = await _movieService.UpdateAsync(movie, userId, token);
         if (updatedMovie is null) return NotFound();
