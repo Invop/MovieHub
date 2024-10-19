@@ -12,7 +12,7 @@ public static class ContractMapping
     {
         var movieId = Guid.NewGuid();
         var allGenres = await genreService.GetAllGenresAsync();
-        var genres = allGenres
+        var selectedGenres = allGenres
             .Where(gl => request.Genres.Contains(gl.Id));
 
         return new Movie
@@ -21,11 +21,16 @@ public static class ContractMapping
             Title = request.Title,
             YearOfRelease = request.YearOfRelease,
             Overview = string.IsNullOrEmpty(request.Overview)
-                ? new Faker().Lorem.Paragraphs(min: 7, max: 10)
+                ? new Faker().Lorem.Paragraphs(min: 1, max: 3)
                 : request.Overview,
             PosterBase64 = request.PosterBase64,
-            Genres = genres
-                .Select(genre => new Genre { GenreId = genre.Id, MovieId = movieId })
+            Genres = selectedGenres
+                .Select(genre => new Genre 
+                { 
+                    GenreId = genre.Id, 
+                    MovieId = movieId,
+                    GenreLookup = genre
+                })
                 .ToList()
         };
     }

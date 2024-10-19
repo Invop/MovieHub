@@ -26,11 +26,9 @@ public class MovieValidator : AbstractValidator<Movie>
         RuleForEach(x => x.Genres)
             .ChildRules(genres =>
             {
-                genres.RuleFor(g => g.GenreLookup)
-                    .NotNull();
-
                 genres.RuleFor(g => g.GenreLookup.Name)
-                    .NotEmpty();
+                    .NotEmpty()
+                    .WithMessage("Genre name is required and cannot be empty.");
             }).WithMessage("Invalid genres");
         ;
 
