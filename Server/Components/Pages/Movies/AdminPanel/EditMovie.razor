@@ -1,0 +1,105 @@
+@page "/edit-movie/{id:guid}"
+@attribute [Authorize]
+
+@if (_isLoading)
+{
+    <div class="rz-text-align-center rz-p-12">
+        <RadzenProgressBarCircular
+            ProgressBarStyle="ProgressBarStyle.Primary"
+            Value="100"
+            ShowValue="false"
+            Mode="ProgressBarMode.Indeterminate"
+            Style="width: 60px; height: 60px;"/>
+        <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4">Loading movie details...</RadzenText>
+    </div>
+}
+else
+{
+    <RadzenRow>
+        <RadzenColumn SizeMD="12">
+            <RadzenTemplateForm TItem="MovieRecord" Data="@Movie" Visible="@(Movie != null)" Submit="@FormSubmit">
+                <RadzenAlert Title="Cannot update movie" Shade="Shade.Lighter" Variant="Variant.Flat"
+                             Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@ErrorVisible">
+                    @Error
+                </RadzenAlert>
+
+                <RadzenRow style="margin-bottom: 1rem">
+                    <RadzenColumn SizeMD="2">
+                        <RadzenLabel Component="Title" style="width: 100%" Text="Title"/>
+                    </RadzenColumn>
+                    <RadzenColumn SizeMD="10">
+                        <RadzenTextBox style="width: 100%" @bind-Value="@(Movie.Title)" Name="Title"/>
+                        <RadzenRequiredValidator Component="Title" Text="Title is required"/>
+                        <RadzenLengthValidator Component="Title" Min="1" Text="First name should be at least 3 characters" Style="position: absolute" />
+                        <RadzenLengthValidator Component="Title"  Max="100" Text="Movie Title should be at most 20 characters" Style="position: absolute" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow style="margin-bottom: 1rem">
+                    <RadzenColumn SizeMD="2">
+                        <RadzenLabel Component="YearOfRelease" style="width: 100%" Text="Year of Release"/>
+                    </RadzenColumn>
+                    <RadzenColumn SizeMD="10">
+                        <RadzenNumeric style="width: 100%" @bind-Value="@(Movie.YearOfRelease)" Name="YearOfRelease"/>
+                        <RadzenRequiredValidator Component="YearOfRelease" Text="Year of Release is required"/>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow style="margin-bottom: 1rem">
+                    <RadzenColumn SizeMD="2">
+                        <RadzenLabel Component="Overview" style="width: 100%" Text="Overview"/>
+                    </RadzenColumn>
+                    <RadzenColumn SizeMD="10">
+                        <RadzenTextArea style="width: 100%" @bind-Value="@(Movie.Overview)" Name="Overview"/>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow style="margin-bottom: 1rem">
+                    <RadzenColumn SizeMD="2">
+                        <RadzenLabel Component="Genres" style="width: 100%" Text="Genres"/>
+                    </RadzenColumn>
+                    <RadzenColumn SizeMD="10">
+                        <RadzenDropDown Data="@Genres.Items" Multiple="true" style="width: 100%"
+                                        TextProperty="Name" @bind-Value="@(Movie.Genres)"
+                                        ValueProperty="Id" Name="Genres"/>
+                        <RadzenRequiredValidator Component="Genres" Text="At least one genre must be selected"/>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow style="margin-bottom: 1rem">
+                    <RadzenColumn SizeMD="2">
+                        <RadzenLabel Component="PosterBase64" style="width: 100%" Text="Poster"/>
+                    </RadzenColumn>
+                    <RadzenColumn SizeMD="10">
+                        <RadzenFileInput
+                            @bind-Value="@Movie.PosterBase64"
+                            @bind-FileName="@_fileName"
+                            @bind-FileSize="@_fileSize"
+                            Accept="image/*"
+                            MaxFileSize="@MaxFileSize"
+                            MaxWidth="@MaxWidth"
+                            MaxHeight="@MaxHeight"
+                            Change="@(args => OnChange(args))"
+                            Error="@(args => OnError(args))"
+                            TValue="string"
+                            class="w-100"
+                            Style="width: 100%"/>
+                        @if (!string.IsNullOrEmpty(Movie.PosterBase64))
+                        {
+                            <img src="data:image/jpeg;base64,@Movie.PosterBase64" 
+                                 alt="Current poster" 
+                                 style="max-width: 150px; margin-top: 10px;" />
+                        }
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                             JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save Changes" Variant="Variant.Flat"/>
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel"
+                                  Click="@CancelClick" Variant="Variant.Flat"/>
+                </RadzenStack>
+            </RadzenTemplateForm>
+        </RadzenColumn>
+    </RadzenRow>
+}

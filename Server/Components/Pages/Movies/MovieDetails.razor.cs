@@ -39,7 +39,9 @@ public partial class MovieDetails : ComponentBase
     MovieResponse _movieData;
     protected override async Task OnInitializedAsync()
     {
-        _movieData = await MovieService.GetMovie(Id);
+        
+        var movieResponse = await MovieService.GetMovie(Id);
+        _movieData = movieResponse.Data;
         _isLoading = false;
     }
 }

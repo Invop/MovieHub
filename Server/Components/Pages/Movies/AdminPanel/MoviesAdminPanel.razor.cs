@@ -54,8 +54,10 @@ public partial class MoviesAdminPanel
                 Page = 1,
                 PageSize = 10
             };
-            _movies = await MovieService.GetMovies(movieRequest);
-            _genres = await MovieService.GetAllGenres();
+            var moviesResponse = await MovieService.GetMovies(movieRequest);
+            _movies = moviesResponse.Data;
+            var genresResponse = await MovieService.GetAllGenresAsync();
+            _genres = genresResponse.Data;
         }
         catch (Exception ex)
         {
@@ -93,24 +95,88 @@ public partial class MoviesAdminPanel
             SortBy = formattedSort
         };
 
-        _movies = await MovieService.GetMovies(movieRequest);
+        var moviesResponse = await MovieService.GetMovies(movieRequest);
+        _movies = moviesResponse.Data;
 
         IsLoading = false;
     }
 
-    private async Task AddClick()
+    private const string CreateMovieErrorMessage =
+        "An error occurred while trying to open the Create new Movie dialog.";
+
+    private const string DeleteMovieErrorMessage = "An error occurred while trying to delete the movie.";
+    private const string EditMovieErrorMessage = "An error occurred while trying to update the role.";
+
+    private async Task OpenCreateMovieDialogAsync()
     {
         try
         {
-            Logger.LogInformation("Opening dialog to add a new application role.");
-            await DialogService.OpenAsync<AddApplicationRole>("Add Application Role");
+            await DialogService.OpenAsync<CreateMovie>("Create new Movie");
+            await LoadMovies();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "An error occurred while trying to open the add application role dialog.");
-            ErrorVisible = true;
-            Error = ex.Message;
+            HandleError(ex, CreateMovieErrorMessage);
         }
+    }
+
+    private async Task DeleteSelectedMovieAsync()
+    {
+        try
+        {
+            var movieToDelete = GetSelectedMovie();
+            if (movieToDelete == null) return;
+            
+            if (await DialogService.Confirm($"Are you sure you want to delete this movie({movieToDelete?.Title})?")==false) return;
+
+            await MovieService.DeleteMovie(movieToDelete.Id);
+            await LoadMovies();
+        }
+        catch (Exception ex)
+        {
+            HandleError(ex, DeleteMovieErrorMessage);
+        }
+    }
+
+    private async Task OpenEditMovieDialogAsync()
+    {
+        try
+        {
+            var movieToEdit = GetSelectedMovie();
+            if (movieToEdit == null) return;
+
+            
+            await DialogService.OpenAsync<EditMovie>("Edit Movie", CreateDialogParameters(movieToEdit.Id));
+            await LoadMovies();
+        }
+        catch (Exception ex)
+        {
+            HandleError(ex, EditMovieErrorMessage);
+        }
+    }
+
+    private async Task LoadMovies()
+    {
+        var movieRequest = CreateMovieRequest();
+        ClearSelection();
+        var moviesResponse = await MovieService.GetMovies(movieRequest);
+        _movies = moviesResponse.Data;
+    }
+
+    private GetAllMoviesRequest CreateMovieRequest()
+    {
+        return new GetAllMoviesRequest
+        {
+            Page = AdminMoviesGrid.CurrentPage + 1,
+            PageSize = AdminMoviesGrid.PageSize,
+        };
+    }
+
+    private void HandleError(Exception ex, string errorMessage)
+    {
+        Logger.LogError(ex, errorMessage);
+        ErrorVisible = true;
+        Error = errorMessage;
     }
 
     private MovieResponse GetSelectedMovie()
@@ -118,56 +184,29 @@ public partial class MoviesAdminPanel
         return _selectedMovie?.FirstOrDefault();
     }
 
-    private async Task DeleteClick()
-    {
-        try
-        {
-            var movieToDelete = GetSelectedMovie();
-            if (movieToDelete == null) return;
-
-            if (await DialogService.Confirm($"Are you sure you want to delete this movie({movieToDelete?.Title})?") ==
-                true)
-            {
-                await MovieService.DeleteMovie(movieToDelete.Id);
-                var movieRequest = new GetAllMoviesRequest()
-                {
-                    Page = AdminMoviesGrid.CurrentPage + 1,
-                    PageSize = AdminMoviesGrid.PageSize,
-                };
-                ClearSelection();
-                _movies = await MovieService.GetMovies(movieRequest);
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "An error occurred while trying to delete the movie.");
-            ErrorVisible = true;
-            Error = "An error occurred while trying to delete the movie.";
-        }
-    }
-
-    private async Task UpdateClick()
-    {
-        try
-        {
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "An error occurred while trying to delete the role.");
-            ErrorVisible = true;
-            Error = "An error occurred while trying to update the role.";
-        }
-    }
-
-    private async Task DetailsClick()
+    private async Task OpenMovieDetailsDialogAsync()
     {
         var movieToRead = GetSelectedMovie();
         if (movieToRead == null) return;
-        await DialogService.OpenAsync<MovieDetails>("Movie Details", new Dictionary<string, object> { { "Id", movieToRead.Id } },
-        new DialogOptions() 
+
+        await DialogService.OpenAsync<MovieDetails>(
+            "Movie Details",
+            CreateDialogParameters(movieToRead.Id),
+            CreateDialogOptions("800px")
+        );
+    }
+
+    private Dictionary<string, object> CreateDialogParameters(Guid movieId)
+    {
+        return new Dictionary<string, object> { { "Id", movieId } };
+    }
+
+    private DialogOptions CreateDialogOptions(string width)
+    {
+        return new DialogOptions
         {
-            Width = "800px", 
-        });
+            Width = width,
+        };
     }
 
     private void ClearSelection()

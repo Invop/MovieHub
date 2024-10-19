@@ -28,27 +28,27 @@
                         <RadzenButton Icon="info"
                                       Text="Details"
                                       Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
-                                      Click="@DetailsClick"
+                                      Click="@OpenMovieDetailsDialogAsync"
                                       Variant="Variant.Flat"
                                       ButtonStyle="ButtonStyle.Secondary"
                                       class="rz-w-100"/>
                         <RadzenButton Icon="autorenew"
                                       Text="Update"
                                       Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
-                                      Click="@UpdateClick"
+                                      Click="@OpenEditMovieDialogAsync"
                                       Variant="Variant.Flat"
                                       ButtonStyle="ButtonStyle.Warning"
                                       class="rz-w-100"/>
                         <RadzenButton Icon="delete"
                                       Text="Delete"
                                       Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
-                                      Click="@DeleteClick"
+                                      Click="@DeleteSelectedMovieAsync"
                                       Variant="Variant.Flat"
                                       ButtonStyle="ButtonStyle.Danger"
                                       class="rz-w-100"/>
                         <RadzenButton Icon="add_circle_outline"
-                                      Text="Add"
-                                      Click="@AddClick"
+                                      Text="Create"
+                                      Click="@OpenCreateMovieDialogAsync"
                                       Variant="Variant.Flat"
                                       class="rz-w-100"/>
                     </RadzenStack>
@@ -67,27 +67,27 @@
                                       Text="Details"
                                       Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
                                       Style=" width: 150px; max-width: 150px;"
-                                      Click="@DetailsClick"
+                                      Click="@OpenMovieDetailsDialogAsync"
                                       Variant="Variant.Flat"
                                       ButtonStyle="ButtonStyle.Secondary"/>
                         <RadzenButton Icon="autorenew"
-                                      Text="Update"
+                                      Text="Edit"
                                       Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
                                       Style=" width: 150px; max-width: 150px;"
-                                      Click="@UpdateClick"
+                                      Click="@OpenEditMovieDialogAsync"
                                       Variant="Variant.Flat"
                                       ButtonStyle="ButtonStyle.Warning"/>
                         <RadzenButton Icon="delete"
                                       Text="Delete"
                                       Style=" width: 150px; max-width: 150px;"
                                       Disabled="@(_selectedMovie == null || !_selectedMovie.Any())"
-                                      Click="@DeleteClick"
+                                      Click="@DeleteSelectedMovieAsync"
                                       Variant="Variant.Flat"
                                       ButtonStyle="ButtonStyle.Danger"/>
                         <RadzenButton Icon="add_circle_outline"
                                       Style=" width: 150px; max-width: 150px;"
-                                      Text="Add"
-                                      Click="@AddClick"
+                                      Text="Create"
+                                      Click="@OpenCreateMovieDialogAsync"
                                       Variant="Variant.Flat"/>
                     </RadzenStack>
                 </div>
