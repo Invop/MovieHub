@@ -8,7 +8,7 @@ using Radzen;
 
 namespace MovieHub.Components.Pages.Movies.AdminPanel;
 
-public partial class CreateMovie : ComponentBase
+public partial class AddMovie : ComponentBase
 {
     [Inject] protected IJSRuntime JsRuntime { get; set; }
 
@@ -22,7 +22,7 @@ public partial class CreateMovie : ComponentBase
 
     [Inject] protected NotificationService NotificationService { get; set; }
     [Inject] protected MovieService MovieService { get; set; }
-    [Inject] protected ILogger<CreateMovie> Logger { get; set; }
+    [Inject] protected ILogger<AddMovie> Logger { get; set; }
     private bool ErrorVisible { get; set; }
     private string Error { get; set; } = "";
     private MovieRecord Movie { get; set; } = new();

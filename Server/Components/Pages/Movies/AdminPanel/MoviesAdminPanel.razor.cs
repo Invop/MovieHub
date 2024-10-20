@@ -45,10 +45,10 @@ public partial class MoviesAdminPanel
     private int? _ratingMax;
 
     protected override async Task OnInitializedAsync()
-    {
+    {   
+        IsLoading = true;
         try
         {
-            Logger.LogInformation("Initializing the MoviesAdminPanel component.");
             var movieRequest = new GetAllMoviesRequest()
             {
                 Page = 1,
@@ -58,6 +58,7 @@ public partial class MoviesAdminPanel
             _movies = moviesResponse.Data;
             var genresResponse = await MovieService.GetAllGenresAsync();
             _genres = genresResponse.Data;
+            IsLoading = false;
         }
         catch (Exception ex)
         {
@@ -107,11 +108,11 @@ public partial class MoviesAdminPanel
     private const string DeleteMovieErrorMessage = "An error occurred while trying to delete the movie.";
     private const string EditMovieErrorMessage = "An error occurred while trying to update the role.";
 
-    private async Task OpenCreateMovieDialogAsync()
+    private async Task AddClick()
     {
         try
         {
-            await DialogService.OpenAsync<CreateMovie>("Create new Movie");
+            await DialogService.OpenAsync<AddMovie>("Add Movie");
             await LoadMovies();
         }
         catch (Exception ex)
@@ -120,7 +121,7 @@ public partial class MoviesAdminPanel
         }
     }
 
-    private async Task DeleteSelectedMovieAsync()
+    private async Task DeleteClick()
     {
         try
         {
@@ -138,7 +139,7 @@ public partial class MoviesAdminPanel
         }
     }
 
-    private async Task OpenEditMovieDialogAsync()
+    private async Task EditClick()
     {
         try
         {
@@ -184,7 +185,7 @@ public partial class MoviesAdminPanel
         return _selectedMovie?.FirstOrDefault();
     }
 
-    private async Task OpenMovieDetailsDialogAsync()
+    private async Task DetailsClick()
     {
         var movieToRead = GetSelectedMovie();
         if (movieToRead == null) return;
