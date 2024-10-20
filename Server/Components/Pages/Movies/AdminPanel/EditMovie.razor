@@ -30,8 +30,8 @@ else
                     <RadzenColumn SizeMD="10">
                         <RadzenTextBox style="width: 100%" @bind-Value="@(Movie.Title)" Name="Title"/>
                         <RadzenRequiredValidator Component="Title" Text="Title is required"/>
-                        <RadzenLengthValidator Component="Title" Min="1" Text="First name should be at least 3 characters" Style="position: absolute" />
-                        <RadzenLengthValidator Component="Title"  Max="100" Text="Movie Title should be at most 20 characters" Style="position: absolute" />
+                        <RadzenLengthValidator Component="Title" Min="1" Text="First name should be at least 1 characters" Style="position: absolute" />
+                        <RadzenLengthValidator Component="Title"  Max="100" Text="Movie Title should be at most 100 characters" Style="position: absolute" />
                     </RadzenColumn>
                 </RadzenRow>
 
