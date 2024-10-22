@@ -1,0 +1,117 @@
+@using MovieHub.Contracts.Requests
+@using MovieHub.Contracts.Responses
+@using MovieHub.Services
+<RadzenCard class="movie-card rz-my-2 rz-mx-auto" Style="max-width: 500px; max-height: 450px;">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="0.5rem" class="rz-p-2">
+        <div class="poster-container">
+            @if (!string.IsNullOrEmpty(Movie.PosterBase64))
+            {
+                <RadzenImage Path="@($"data:image/jpeg;base64,{Movie.PosterBase64}")"
+                             Style="width: 160px; height: 240px; border-radius: 6px; object-fit: cover;"
+                             class="rz-shadow-2"
+                             AlternateText="@($"{Movie.Title} poster")"/>
+            }
+            else
+            {
+                <div class="placeholder-poster">
+                    <RadzenIcon Icon="movie" Style="width: 48px; height: 48px; color: var(--rz-text-disabled-color);"/>
+                </div>
+            }
+
+            <div class="rz-p-2 rz-text-align-center">
+                <RadzenRating Value="@((int)(Movie.Rating ?? 0))"
+                              ReadOnly="true"
+                              Style="color: var(--rz-warning); font-size: 1rem;"/>
+                @if (Movie.Rating.HasValue)
+                {
+                    <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-1">@Movie.Rating.Value.ToString("F1")</RadzenText>
+                }
+            </div>
+        </div>
+
+        <RadzenStack Gap="0" class="rz-p-2" Style="flex: 1;">
+            <div class="rz-display-flex rz-justify-content-between rz-align-items-start">
+                <RadzenStack Gap="0">
+                    <RadzenText TextStyle="TextStyle.H5" class="rz-mb-1">@Movie.Title</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" class="rz-text-secondary">@Movie.YearOfRelease</RadzenText>
+                </RadzenStack>
+            </div>
+
+            <div class="genres rz-mt-2">
+                @foreach (var genre in Movie.Genres)
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Light"
+                                 Text="@genre"
+                                 class="rz-mr-1 rz-mb-1 rz-px-2 rz-py-1"/>
+                }
+            </div>
+
+            <RadzenCard class="rz-background-color-base-100 rz-shadow-0 rz-mt-2 rz-p-2">
+                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-1">Overview</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="movie-overview">
+                    @Movie.Overview
+                </RadzenText>
+            </RadzenCard>
+
+            <div class="rz-mt-2 rz-background-color-primary-lighter rz-p-2 rz-border-radius-2">
+                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-2 rz-text-align-center">Rate this movie</RadzenText>
+                <div class="rz-p-2 rz-text-align-center">
+                    <RadzenRating TValue="int"
+                                  Value="@userRating"
+                                  Change="@(args => HandleRatingChange(args))"
+                                  Style="font-size: 1.5rem; color: var(--rz-warning);"/>
+                    @if (userRating > 0)
+                    {
+                        <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2">
+                            Your rating: @userRating/5
+                        </RadzenText>
+                    }
+                </div>
+            </div>
+
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         JustifyContent="JustifyContent.End"
+                         Gap="0.5rem"
+                         class="rz-mt-2">
+                <RadzenButton 
+                              ButtonStyle="ButtonStyle.Secondary"
+                              Text="Details"
+                              class="rz-px-3"/>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    [Parameter] public required MovieResponse Movie { get; set; }
+    [Inject] protected MovieService MovieService { get; set; }
+    [Inject] protected SecurityService SecurityService { get; set; }
+    private int userRating;
+
+    protected override void OnInitialized()
+    {
+        userRating = Movie.UserRating ?? 0;
+    }
+
+    private async Task HandleRatingChange(int rating)
+    {
+        ServiceResponse<bool> result;
+        var request = new RateMovieRequest
+        {
+            Rating = rating
+        };
+        if (rating == 0)
+        {
+            result  = await MovieService.DeleteRating(Movie.Id);
+        }
+        else
+        { 
+            result = await MovieService.RateMovie(Movie.Id, request);
+        }
+        if(result.IsSuccess)
+        {
+            userRating = rating;
+        }
+    }
+
+}

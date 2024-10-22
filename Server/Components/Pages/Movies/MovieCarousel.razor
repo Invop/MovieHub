@@ -1,0 +1,21 @@
+@if (!IsLoading)
+{
+    <RadzenCarousel Style="height: 500px; max-width: 600px;"
+                    Interval="@(8000)" Auto="true"
+                    AllowNavigation="true"
+                    ButtonSize="ButtonSize.Medium"
+                    ButtonStyle="ButtonStyle.Base"
+                    ButtonShade="Shade.Default"
+                    ButtonVariant="Variant.Flat"
+                    class="rz-mx-auto">
+        <Items>
+            @foreach (var movie in Movies.Items)
+            {
+                <RadzenCarouselItem>
+                    <MovieCarouselCard
+                        Movie="@movie"/>
+                </RadzenCarouselItem>
+            }
+        </Items>
+    </RadzenCarousel>
+}
