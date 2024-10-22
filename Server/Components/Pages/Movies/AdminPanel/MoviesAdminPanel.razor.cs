@@ -123,19 +123,32 @@ public partial class MoviesAdminPanel
 
     private async Task DeleteClick()
     {
-        try
+        var movieToDelete = GetSelectedMovie();
+        if (movieToDelete == null) 
         {
-            var movieToDelete = GetSelectedMovie();
-            if (movieToDelete == null) return;
-            
-            if (await DialogService.Confirm($"Are you sure you want to delete this movie({movieToDelete?.Title})?")==false) return;
+            NotificationService.Notify(NotificationSeverity.Warning, "Warning", "No movie selected");
+            return;
+        }
+    
+        bool? confirmResult = await DialogService.Confirm($"Are you sure you want to delete this movie ({movieToDelete?.Title})?");
+        if (confirmResult == false) return;
 
-            await MovieService.DeleteMovie(movieToDelete.Id);
+        var response = await MovieService.DeleteMovie(movieToDelete.Id);
+        if (response.IsSuccess)
+        {
+            NotificationService.Notify(NotificationSeverity.Success, "Success", "Movie deleted successfully");
             await LoadMovies();
         }
-        catch (Exception ex)
+        else
         {
-            HandleError(ex, DeleteMovieErrorMessage);
+            foreach (var errorMessage in response.ErrorMessages)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error, Summary = "Error", Detail = errorMessage,
+                    Duration = 8000
+                });
+            }
         }
     }
 

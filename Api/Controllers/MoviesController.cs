@@ -38,10 +38,11 @@ public class MoviesController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateMovieRequest request, CancellationToken token)
     {
         var movie = await request.MapToMovie(_genreService);
-        await _movieService.CreateAsync(movie, token);
+        var result = await _movieService.CreateAsync(movie, token);
         await _outputCacheStore.EvictByTagAsync("movies", token);
         var movieResponse = movie.MapToResponse();
-        return CreatedAtAction(nameof(Get), new { idOrSlug = movie.Id }, movieResponse);
+        //return CreatedAtAction(nameof(Get), new { idOrSlug = movie.Id }, movieResponse);
+        return result ? Ok() : NotFound();
     }
 
     [AllowAnonymous]

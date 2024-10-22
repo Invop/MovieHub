@@ -86,27 +86,33 @@ public partial class EditMovie : ComponentBase
         }
     }
 
-    private async Task FormSubmit()
+    private async Task FormSubmit(MovieRecord movie)
     {
-        try
+        UpdateMovieRequest request = new UpdateMovieRequest()
         {
-            UpdateMovieRequest request = new UpdateMovieRequest()
-            {
-                Title = Movie.Title,
-                YearOfRelease = Movie.YearOfRelease,
-                Overview = Movie.Overview,
-                PosterBase64 = Movie.PosterBase64,
-                Genres = Movie.Genres
-            };
-            await MovieService.UpdateMovie(Id, request);
+            Title = movie.Title,
+            YearOfRelease = movie.YearOfRelease,
+            Overview = movie.Overview,
+            PosterBase64 = movie.PosterBase64,
+            Genres = movie.Genres
+        };
+    
+        var response = await MovieService.UpdateMovie(Id, request);
+        if (response.IsSuccess)
+        {
             NotificationService.Notify(NotificationSeverity.Success, "Success", "Movie updated successfully");
             DialogService.Close(null);
         }
-        catch (Exception ex)
+        else
         {
-            Logger.LogError(ex, "Error updating movie");
-            ErrorVisible = true;
-            Error = ex.Message;
+            foreach (var errorMessage in response.ErrorMessages)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error, Summary = "Error", Detail = errorMessage,
+                    Duration = 8000
+                });
+            }
         }
     }
 

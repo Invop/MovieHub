@@ -9,7 +9,7 @@ Content-Type: application/json
 ###
 
 # Get genre by ID or Name (example with ID: 1)
-GET https://localhost:7287/api/genres/1?api-version=1.0
+GET https://localhost:5001/api/genres/20?api-version=1.0
 
 ###
 

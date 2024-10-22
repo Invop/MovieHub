@@ -65,26 +65,31 @@ public partial class AddMovie : ComponentBase
     }
     private async Task FormSubmit()
     {
-        try
+        var request = new CreateMovieRequest()
         {
+            Title = Movie.Title,
+            YearOfRelease = Movie.YearOfRelease,
+            Overview = Movie.Overview,
+            PosterBase64 = Movie.PosterBase64,
+            Genres = Movie.Genres,
+        };
 
-            var request = new CreateMovieRequest()
-            {
-                Title = Movie.Title,
-                YearOfRelease = Movie.YearOfRelease,
-                Overview = Movie.Overview,
-                PosterBase64 = Movie.PosterBase64,
-                Genres = Movie.Genres,
-            };
-            
-            await MovieService.CreateMovie(request);
+        var response = await MovieService.CreateMovie(request);
+        if (response.IsSuccess)
+        {
             NotificationService.Notify(NotificationSeverity.Success, "Success", "Movie created successfully");
             DialogService.Close(null);
         }
-        catch (Exception ex)
+        else
         {
-            ErrorVisible = true;
-            Error = ex.Message;
+            foreach (var errorMessage in response.ErrorMessages)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error, Summary = "Error", Detail = errorMessage,
+                    Duration = 8000
+                });
+            }
         }
     }
 

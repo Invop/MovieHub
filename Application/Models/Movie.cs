@@ -42,7 +42,7 @@ public partial class Movie
 
     public string? PosterBase64 { get; set; } = string.Empty;
 
-    public string Overview { get; set; } = string.Empty;
+    public string? Overview { get; set; } = string.Empty;
 
     // Navigation properties
     public ICollection<Genre> Genres { get; set; } = new List<Genre>();
