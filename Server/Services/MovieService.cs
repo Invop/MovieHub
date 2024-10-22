@@ -18,7 +18,8 @@ namespace MovieHub.Services
         private const string GenresEndpoint = "/api/genres";
         private readonly HttpClient _httpClient;
 
-        public MovieService(IHttpClientFactory httpClientFactory, ITokenManager tokenManager, ILogger<MovieService> logger)
+        public MovieService(IHttpClientFactory httpClientFactory, ITokenManager tokenManager,
+            ILogger<MovieService> logger)
         {
             _httpClientFactory = httpClientFactory;
             _tokenManager = tokenManager;
@@ -38,10 +39,14 @@ namespace MovieHub.Services
             await SetAuthorizationHeaderAsync();
             var response = await _httpClient.GetAsync($"{MovieEndpoint}/{idOrSlug}");
 
-            var errorMessage = await LogIfError(response, $"Failed to get movie {idOrSlug}");
-            var data = errorMessage == null ? await response.Content.ReadFromJsonAsync<MovieResponse>() : null;
+            var errorMessages = await LogIfError(response, $"Failed to get movie {idOrSlug}");
+            var data = errorMessages.Length == 0 ? await response.Content.ReadFromJsonAsync<MovieResponse>() : null;
 
-            return new ServiceResponse<MovieResponse> { Data = data, ErrorMessage = errorMessage };
+            return new ServiceResponse<MovieResponse>
+            {
+                Data = data,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<MoviesResponse>> GetMovies(GetAllMoviesRequest request)
@@ -50,10 +55,14 @@ namespace MovieHub.Services
             var queryString = BuildGetAllMoviesQueryString(request);
             var response = await _httpClient.GetAsync(MovieEndpoint + queryString);
 
-            var errorMessage = await LogIfError(response, $"Failed to get movies with request {request}");
-            var data = errorMessage == null ? await response.Content.ReadFromJsonAsync<MoviesResponse>() : null;
+            var errorMessages = await LogIfError(response, $"Failed to get movies with request {request}");
+            var data = errorMessages.Length == 0 ? await response.Content.ReadFromJsonAsync<MoviesResponse>() : null;
 
-            return new ServiceResponse<MoviesResponse> { Data = data, ErrorMessage = errorMessage };
+            return new ServiceResponse<MoviesResponse>
+            {
+                Data = data,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<bool>> CreateMovie(CreateMovieRequest request)
@@ -65,8 +74,12 @@ namespace MovieHub.Services
             };
             var response = await _httpClient.SendAsync(requestMessage);
 
-            var errorMessage = await LogIfError(response, $"Failed to create movie with request {request}");
-            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
+            var errorMessages = await LogIfError(response, $"Failed to create movie with request {request}");
+            return new ServiceResponse<bool>
+            {
+                Data = errorMessages.Length == 0,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<bool>> UpdateMovie(Guid id, UpdateMovieRequest request)
@@ -78,8 +91,12 @@ namespace MovieHub.Services
             };
             var response = await _httpClient.SendAsync(requestMessage);
 
-            var errorMessage = await LogIfError(response, $"Failed to update movie {id} with request {request}");
-            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
+            var errorMessages = await LogIfError(response, $"Failed to update movie {id} with request {request}");
+            return new ServiceResponse<bool>
+            {
+                Data = errorMessages.Length == 0,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<bool>> DeleteMovie(Guid id)
@@ -87,8 +104,12 @@ namespace MovieHub.Services
             await SetAuthorizationHeaderAsync();
             var response = await _httpClient.DeleteAsync($"{MovieEndpoint}/{id}");
 
-            var errorMessage = await LogIfError(response, $"Failed to delete movie {id}");
-            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
+            var errorMessages = await LogIfError(response, $"Failed to delete movie {id}");
+            return new ServiceResponse<bool>
+            {
+                Data = errorMessages.Length == 0,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<bool>> RateMovie(Guid id, RateMovieRequest request)
@@ -100,8 +121,12 @@ namespace MovieHub.Services
             };
             var response = await _httpClient.SendAsync(requestMessage);
 
-            var errorMessage = await LogIfError(response, $"Failed to rate movie {id} with request {request}");
-            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
+            var errorMessages = await LogIfError(response, $"Failed to rate movie {id} with request {request}");
+            return new ServiceResponse<bool>
+            {
+                Data = errorMessages.Length == 0,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<bool>> DeleteRating(Guid id)
@@ -109,8 +134,12 @@ namespace MovieHub.Services
             await SetAuthorizationHeaderAsync();
             var response = await _httpClient.DeleteAsync($"{MovieEndpoint}/{id}/ratings");
 
-            var errorMessage = await LogIfError(response, $"Failed to delete rating for movie {id}");
-            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
+            var errorMessages = await LogIfError(response, $"Failed to delete rating for movie {id}");
+            return new ServiceResponse<bool>
+            {
+                Data = errorMessages.Length == 0,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<MovieRatingResponse[]>> GetUserRatings()
@@ -118,10 +147,16 @@ namespace MovieHub.Services
             await SetAuthorizationHeaderAsync();
             var response = await _httpClient.GetAsync($"{MovieRatingsEndpoint}/me");
 
-            var errorMessage = await LogIfError(response, "Failed to get user ratings");
-            var data = errorMessage == null ? await response.Content.ReadFromJsonAsync<MovieRatingResponse[]>() : null;
+            var errorMessages = await LogIfError(response, "Failed to get user ratings");
+            var data = errorMessages.Length == 0
+                ? await response.Content.ReadFromJsonAsync<MovieRatingResponse[]>()
+                : null;
 
-            return new ServiceResponse<MovieRatingResponse[]> { Data = data, ErrorMessage = errorMessage };
+            return new ServiceResponse<MovieRatingResponse[]>
+            {
+                Data = data,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<GenreResponse>> GetGenre(string idOrName)
@@ -129,10 +164,14 @@ namespace MovieHub.Services
             await SetAuthorizationHeaderAsync();
             var response = await _httpClient.GetAsync($"{GenresEndpoint}/{idOrName}");
 
-            var errorMessage = await LogIfError(response, $"Failed to get genre {idOrName}");
-            var data = errorMessage == null ? await response.Content.ReadFromJsonAsync<GenreResponse>() : null;
+            var errorMessages = await LogIfError(response, $"Failed to get genre {idOrName}");
+            var data = errorMessages.Length == 0 ? await response.Content.ReadFromJsonAsync<GenreResponse>() : null;
 
-            return new ServiceResponse<GenreResponse> { Data = data, ErrorMessage = errorMessage };
+            return new ServiceResponse<GenreResponse>
+            {
+                Data = data,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<GenresResponse>> GetAllGenresAsync()
@@ -140,10 +179,14 @@ namespace MovieHub.Services
             await SetAuthorizationHeaderAsync();
             var response = await _httpClient.GetAsync(GenresEndpoint);
 
-            var errorMessage = await LogIfError(response, "Failed to get all genres");
-            var data = errorMessage == null ? await response.Content.ReadFromJsonAsync<GenresResponse>() : null;
+            var errorMessages = await LogIfError(response, "Failed to get all genres");
+            var data = errorMessages.Length == 0 ? await response.Content.ReadFromJsonAsync<GenresResponse>() : null;
 
-            return new ServiceResponse<GenresResponse> { Data = data, ErrorMessage = errorMessage };
+            return new ServiceResponse<GenresResponse>
+            {
+                Data = data,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<bool>> CreateGenre(CreateGenreRequest request)
@@ -155,8 +198,12 @@ namespace MovieHub.Services
             };
             var response = await _httpClient.SendAsync(requestMessage);
 
-            var errorMessage = await LogIfError(response, $"Failed to create genre with request {request}");
-            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
+            var errorMessages = await LogIfError(response, $"Failed to create genre with request {request}");
+            return new ServiceResponse<bool>
+            {
+                Data = errorMessages.Length == 0,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<bool>> UpdateGenre(int id, UpdateGenreRequest request)
@@ -168,8 +215,12 @@ namespace MovieHub.Services
             };
             var response = await _httpClient.SendAsync(requestMessage);
 
-            var errorMessage = await LogIfError(response, $"Failed to update genre {id} with request {request}");
-            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
+            var errorMessages = await LogIfError(response, $"Failed to update genre {id} with request {request}");
+            return new ServiceResponse<bool>
+            {
+                Data = errorMessages.Length == 0,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
         public async Task<ServiceResponse<bool>> DeleteGenre(int id)
@@ -177,47 +228,77 @@ namespace MovieHub.Services
             await SetAuthorizationHeaderAsync();
             var response = await _httpClient.DeleteAsync($"{GenresEndpoint}/{id}");
 
-            var errorMessage = await LogIfError(response, $"Failed to delete genre {id}");
-            return new ServiceResponse<bool> { Data = errorMessage == null, ErrorMessage = errorMessage };
+            var errorMessages = await LogIfError(response, $"Failed to delete genre {id}");
+            return new ServiceResponse<bool>
+            {
+                Data = errorMessages.Length == 0,
+                ErrorMessages = errorMessages.ToList()
+            };
         }
 
-        private async Task<string> LogIfError(HttpResponseMessage response, string message)
+        private async Task<string[]> LogIfError(HttpResponseMessage response, string message)
         {
             if (!response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var errorMessage = new StringBuilder();
+                var errorMessages = new List<string>();
 
+                // Try to deserialize as a dictionary of lists (errors by property name)
                 try
                 {
-                    var validationFailureResponse = JsonConvert.DeserializeObject<ValidationFailureResponse>(responseContent);
+                    var validationFailureResponseDict =
+                        JsonConvert.DeserializeObject<ValidationFailureResponseDict>(responseContent);
 
-                    if (validationFailureResponse != null)
+                    if (validationFailureResponseDict?.Errors != null)
                     {
-                        foreach (var error in validationFailureResponse.Errors)
+                        foreach (var error in validationFailureResponseDict.Errors)
                         {
-                            var logMessage = $"Error: {error.Message}";
-                            _logger.LogError($"{message}, Status Code: {response.StatusCode}, {logMessage}");
-                            errorMessage.AppendLine(logMessage);
+                            foreach (var errorDetail in error.Value)
+                            {
+                                var logMessage = $"Error in field '{error.Key}': {errorDetail}";
+                                _logger.LogError($"{message}, Status Code: {response.StatusCode}, {logMessage}");
+                                errorMessages.Add(logMessage);
+                            }
                         }
-                    }
-                    else
-                    {
-                        var logMessage = "No validation errors returned.";
-                        _logger.LogError($"{message}, Status Code: {response.StatusCode}, {logMessage}");
-                        errorMessage.AppendLine(logMessage);
+
+                        return errorMessages.ToArray();
                     }
                 }
-                catch (JsonException ex)
+                catch (JsonException)
                 {
-                    _logger.LogError($"{message}, Status Code: {response.StatusCode}, Response: {responseContent}");
-                    _logger.LogError(ex, "Failed to deserialize validation error response.");
                 }
 
-                return errorMessage.ToString();
+                // Try to deserialize as a list of validation errors
+                try
+                {
+                    var validationFailureResponseArray =
+                        JsonConvert.DeserializeObject<ValidationFailureResponseArray>(responseContent);
+
+                    if (validationFailureResponseArray?.Errors != null)
+                    {
+                        foreach (var error in validationFailureResponseArray.Errors)
+                        {
+                            var logMessage = $"Error in field '{error.PropertyName}': {error.Message}";
+                            _logger.LogError($"{message}, Status Code: {response.StatusCode}, {logMessage}");
+                            errorMessages.Add(logMessage);
+                        }
+
+                        return errorMessages.ToArray();
+                    }
+                }
+                catch (JsonException)
+                {
+                }
+
+                // If both deserialization attempts fail
+                _logger.LogError($"{message}, Status Code: {response.StatusCode}, Response: {responseContent}");
+                _logger.LogError("Failed to deserialize validation error response.");
+                errorMessages.Add("Failed to deserialize validation error response.");
+
+                return errorMessages.ToArray();
             }
 
-            return null;
+            return Array.Empty<string>();
         }
 
         private string BuildGetAllMoviesQueryString(GetAllMoviesRequest request)
@@ -260,11 +341,28 @@ namespace MovieHub.Services
             return "?" + string.Join("&", queryParams);
         }
     }
+
+    public class ValidationFailureResponseDict
+    {
+        public Dictionary<string, List<string>> Errors { get; set; }
+    }
+
+    public class ValidationError
+    {
+        public string PropertyName { get; set; }
+        public string Message { get; set; }
+    }
+
+    public class ValidationFailureResponseArray
+    {
+        public List<ValidationError> Errors { get; set; }
+    }
+
     public class ServiceResponse<T>
     {
         public T Data { get; set; }
-        public string ErrorMessage { get; set; }
+        public List<string> ErrorMessages { get; set; } = new List<string>();
 
-        public bool IsSuccess => string.IsNullOrEmpty(ErrorMessage);
+        public bool IsSuccess => ErrorMessages == null || !ErrorMessages.Any();
     }
 }

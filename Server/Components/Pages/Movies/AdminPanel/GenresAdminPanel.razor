@@ -1,0 +1,100 @@
+@page "/genres-admin"
+@using MovieHub.Contracts.Responses
+@using MovieHub.Models
+@attribute [Authorize]
+
+<PageTitle>Genres</PageTitle>
+<RadzenStack>
+    <RadzenColumn Size="12" SizeMD="5">
+        <RadzenText Text="Movies" TextStyle="TextStyle.H3" TagName="TagName.H1" class="rz-mb-0"/>
+    </RadzenColumn>
+    <RadzenRow AlignItems="AlignItems.Center"
+
+               JustifyContent="JustifyContent.End">
+        <RadzenColumn Size="12">
+            <RadzenStack Gap="1rem" class="rz-mt-4 rz-mt-md-0">
+                <!-- Mobile view (stacked) -->
+                <div class="rz-display-md-none">
+                    <RadzenStack Gap="0.5rem">
+                        <RadzenButton Click="@ClearSelection"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Info"
+                                      Text="Clear Selection"
+                                      class="rz-w-100"/>
+                        <RadzenButton Icon="autorenew"
+                                      Text="Update"
+                                      Disabled="@(_selectedGenres == null || !_selectedGenres.Any())"
+                                      Click="@EditClick"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Warning"
+                                      class="rz-w-100"/>
+                        <RadzenButton Icon="delete"
+                                      Text="Delete"
+                                      Disabled="@(_selectedGenres == null || !_selectedGenres.Any())"
+                                      Click="@DeleteClick"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      class="rz-w-100"/>
+                        <RadzenButton Icon="add_circle_outline"
+                                      Text="Add"
+                                      Click="@AddClick"
+                                      Variant="Variant.Flat"
+                                      class="rz-w-100"/>
+                    </RadzenStack>
+                </div>
+
+                <!-- Desktop view (horizontal) -->
+                <div class="rz-display-none rz-display-md-block">
+                    <RadzenStack Orientation="Orientation.Horizontal"
+                                 JustifyContent="JustifyContent.End"
+                                 Gap="0.5rem">
+                        <RadzenButton Click="@ClearSelection"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Info"
+                                      Text="Clear Selection"/>
+                        <RadzenButton Icon="autorenew"
+                                      Text="Edit"
+                                      Disabled="@(_selectedGenres == null || !_selectedGenres.Any())"
+                                      Style=" width: 150px; max-width: 150px;"
+                                      Click="@EditClick"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Warning"/>
+                        <RadzenButton Icon="delete"
+                                      Text="Delete"
+                                      Style=" width: 150px; max-width: 150px;"
+                                      Disabled="@(_selectedGenres == null || !_selectedGenres.Any())"
+                                      Click="@DeleteClick"
+                                      Variant="Variant.Flat"
+                                      ButtonStyle="ButtonStyle.Danger"/>
+                        <RadzenButton Icon="add_circle_outline"
+                                      Style=" width: 150px; max-width: 150px;"
+                                      Text="Add"
+                                      Click="@AddClick"
+                                      Variant="Variant.Flat"/>
+                    </RadzenStack>
+                </div>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD="12">
+            @if(Genres is not null)
+            {
+                <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat"
+                             Title="Cannot delete genre" Visible="@ErrorVisible">@Error</RadzenAlert>
+                <RadzenDataGrid @ref="GenresGrid" AllowFiltering="false" AllowPaging="true" ShowPagingSummary="true"
+                                PageSizeOptions=@(new int[] { 5, 15, 25 }) AllowSorting="false" IsLoading="@IsLoading"
+                                SelectionMode="DataGridSelectionMode.Single" @bind-Value="_selectedGenres"
+                                Data="@Genres.Items" TItem="GenreResponse" LoadData="@((args) => LoadGenresAsync(args))">
+                    <EmptyTemplate>
+                        <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
+                    </EmptyTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn TItem="GenreResponse" Width="100px" Property="Id" Title="Id"/>
+                        <RadzenDataGridColumn TItem="GenreResponse" Property="Name" Title="Name"/>
+                    </Columns>
+                </RadzenDataGrid>
+            }
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>

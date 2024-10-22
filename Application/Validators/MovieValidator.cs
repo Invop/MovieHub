@@ -41,14 +41,10 @@ public class MovieValidator : AbstractValidator<Movie>
         RuleFor(x => x.Slug)
             .MustAsync(ValidateSlug)
             .WithMessage("This movie already exists in the system");
-
-        RuleFor(x => x.Overview)
-            .MaximumLength(500)
-            .WithMessage("Overview can't be longer than 500 characters.");
-
-        RuleFor(x => x.PosterBase64)
+        
+        /*RuleFor(x => x.PosterBase64)
             .Must(IsValidBase64)
-            .WithMessage("Poster must be a valid Base64 string.");
+            .WithMessage("Poster must be a valid Base64 string.");*/
     }
 
     private async Task<bool> ValidateSlug(Movie movie, string slug, CancellationToken token = default)
@@ -62,7 +58,7 @@ public class MovieValidator : AbstractValidator<Movie>
 
     private bool IsValidBase64(string? base64Text)
     {
-        if (base64Text == null) return true; // Allow null values
+        if (string.IsNullOrEmpty(base64Text)) return true; // Allow null values
 
         return Base64.IsValid(base64Text.AsSpan());
     }
