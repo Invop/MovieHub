@@ -29,13 +29,18 @@ public partial class GenresAdminPanel : ComponentBase
     protected bool IsLoading = false;
     [Inject] protected SecurityService Security { get; set; }
     [Inject] protected MovieService MovieService { get; set; }
-    
-    
+
+
     protected GenresResponse Genres { get; set; }
     private IList<GenreResponse> _selectedGenres;
 
     protected override async Task OnInitializedAsync()
     {
+        if (!Security.IsAdministrator())
+        {
+            NavigationManager.NavigateTo("/unauthorized");
+        }
+
         IsLoading = true;
         var genresResponse = await MovieService.GetAllGenresAsync();
         Genres = genresResponse.Data;
@@ -49,16 +54,18 @@ public partial class GenresAdminPanel : ComponentBase
         Genres = genresResponse.Data;
         IsLoading = false;
     }
+
     private async Task LoadGenresAsync()
     {
         var genresResponse = await MovieService.GetAllGenresAsync();
         Genres = genresResponse.Data;
     }
+
     protected async Task AddClick()
     {
         await DialogService.OpenAsync<AddGenre>("Add Genre");
-
     }
+
     protected async Task EditClick()
     {
         try
@@ -66,7 +73,7 @@ public partial class GenresAdminPanel : ComponentBase
             var genreToEdit = GetSelectedGenre();
             if (genreToEdit == null) return;
 
-            
+
             await DialogService.OpenAsync<EditGenre>("Edit Genre", CreateDialogParameters(genreToEdit.Id));
             await LoadGenresAsync();
         }
@@ -75,16 +82,18 @@ public partial class GenresAdminPanel : ComponentBase
             HandleError(ex, "Edit Genre Failed");
         }
     }
+
     protected async Task DeleteClick()
     {
         var genreToDelete = GetSelectedGenre();
-        if (genreToDelete == null) 
+        if (genreToDelete == null)
         {
             NotificationService.Notify(NotificationSeverity.Warning, "Warning", "No genre selected");
             return;
         }
-    
-        bool? confirmResult = await DialogService.Confirm($"Are you sure you want to delete this genre({genreToDelete?.Name})?");
+
+        bool? confirmResult =
+            await DialogService.Confirm($"Are you sure you want to delete this genre({genreToDelete?.Name})?");
         if (confirmResult == false) return;
 
         var response = await MovieService.DeleteGenre(genreToDelete.Id);
@@ -105,23 +114,26 @@ public partial class GenresAdminPanel : ComponentBase
             }
         }
     }
+
     private void HandleError(Exception ex, string errorMessage)
     {
         Logger.LogError(ex, errorMessage);
         ErrorVisible = true;
         Error = errorMessage;
     }
+
     private Dictionary<string, object> CreateDialogParameters(int genreId)
     {
         return new Dictionary<string, object> { { "Id", genreId } };
     }
+
     private GenreResponse GetSelectedGenre()
     {
         return _selectedGenres?.FirstOrDefault();
     }
+
     private void ClearSelection()
     {
         _selectedGenres = null;
     }
-
 }

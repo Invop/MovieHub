@@ -20,11 +20,12 @@ public partial class EditMovie : ComponentBase
     [Inject] protected NotificationService NotificationService { get; set; }
     [Inject] protected MovieService MovieService { get; set; }
     [Inject] protected ILogger<EditMovie> Logger { get; set; }
-
+    [Inject] protected SecurityService Security{get;set;}
     private bool ErrorVisible { get; set; }
     private string Error { get; set; } = "";
     private MovieRecord Movie { get; set; } = new();
     private GenresResponse Genres { get; set; }
+    
     private bool _isLoading = true;
 
     private string _fileName;
@@ -43,7 +44,10 @@ public partial class EditMovie : ComponentBase
     ];
 
     protected override async Task OnInitializedAsync()
-    {
+    {        if (!Security.IsAdministrator())
+        {
+            NavigationManager.NavigateTo("/unauthorized");
+        }
         try
         {
             var movieResponse = await MovieService.GetMovie(Id);

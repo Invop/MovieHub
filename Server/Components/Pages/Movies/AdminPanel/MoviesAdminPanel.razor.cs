@@ -45,7 +45,12 @@ public partial class MoviesAdminPanel
     private int? _ratingMax;
 
     protected override async Task OnInitializedAsync()
-    {   
+    {
+        if (!Security.IsAdministrator())
+        {
+            NavigationManager.NavigateTo("/unauthorized");
+        }
+
         IsLoading = true;
         try
         {
@@ -124,13 +129,14 @@ public partial class MoviesAdminPanel
     private async Task DeleteClick()
     {
         var movieToDelete = GetSelectedMovie();
-        if (movieToDelete == null) 
+        if (movieToDelete == null)
         {
             NotificationService.Notify(NotificationSeverity.Warning, "Warning", "No movie selected");
             return;
         }
-    
-        bool? confirmResult = await DialogService.Confirm($"Are you sure you want to delete this movie ({movieToDelete?.Title})?");
+
+        bool? confirmResult =
+            await DialogService.Confirm($"Are you sure you want to delete this movie ({movieToDelete?.Title})?");
         if (confirmResult == false) return;
 
         var response = await MovieService.DeleteMovie(movieToDelete.Id);
@@ -159,7 +165,7 @@ public partial class MoviesAdminPanel
             var movieToEdit = GetSelectedMovie();
             if (movieToEdit == null) return;
 
-            
+
             await DialogService.OpenAsync<EditMovie>("Edit Movie", CreateDialogParameters(movieToEdit.Id));
             await LoadMovies();
         }

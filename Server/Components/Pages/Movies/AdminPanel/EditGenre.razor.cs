@@ -30,6 +30,10 @@ public partial class EditGenre : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        if (!Security.IsAdministrator())
+        {
+            NavigationManager.NavigateTo("/unauthorized");
+        }
         var genreResponse = await MovieService.GetGenre(Id.ToString());
         Genre = new GenreToUpdate
         {

@@ -35,6 +35,10 @@ namespace MovieHub.Components.Pages.ApplicationUser
 
         protected override async Task OnInitializedAsync()
         {
+            if (!Security.IsAdministrator())
+            {
+                NavigationManager.NavigateTo("/unauthorized");
+            }
             Users = await Security.GetUsers();
         }
 

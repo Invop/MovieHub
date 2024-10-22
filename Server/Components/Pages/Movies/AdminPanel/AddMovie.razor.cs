@@ -23,6 +23,7 @@ public partial class AddMovie : ComponentBase
     [Inject] protected NotificationService NotificationService { get; set; }
     [Inject] protected MovieService MovieService { get; set; }
     [Inject] protected ILogger<AddMovie> Logger { get; set; }
+    [Inject] protected SecurityService Security{get;set;}
     private bool ErrorVisible { get; set; }
     private string Error { get; set; } = "";
     private MovieRecord Movie { get; set; } = new();
@@ -46,6 +47,10 @@ public partial class AddMovie : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        if (!Security.IsAdministrator())
+        {
+            NavigationManager.NavigateTo("/unauthorized");
+        }
         var genresResponse = await MovieService.GetAllGenresAsync();
         Genres = genresResponse.Data;
         _isLoading = false;

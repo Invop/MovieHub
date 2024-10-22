@@ -35,6 +35,10 @@ namespace MovieHub.Components.Pages.Movies.AdminPanel
         protected MovieService MovieService { get; set; }
         protected override async Task OnInitializedAsync()
         {
+            if (!Security.IsAdministrator())
+            {
+                NavigationManager.NavigateTo("/unauthorized");
+            }
             Genre = new NewGenre();
         }
 

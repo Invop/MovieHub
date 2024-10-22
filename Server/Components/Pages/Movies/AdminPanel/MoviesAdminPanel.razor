@@ -2,11 +2,6 @@
 @using MovieHub.Contracts.Responses
 @attribute [Authorize]
 
-@if (!Security.IsAdministrator())
-{
-    <Unauthorized/>
-}
-
 <PageTitle>Movies-admin</PageTitle>
 <RadzenStack>
     <RadzenColumn Size="12" SizeMD="5">

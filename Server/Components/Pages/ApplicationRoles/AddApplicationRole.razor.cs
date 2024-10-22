@@ -33,6 +33,10 @@ namespace MovieHub.Components.Pages.ApplicationRoles
 
         protected override async Task OnInitializedAsync()
         {
+            if (!Security.IsAdministrator())
+            {
+                NavigationManager.NavigateTo("/unauthorized");
+            }
             Role = new MovieHub.Models.ApplicationRole();
         }
 
