@@ -6,7 +6,9 @@ using MovieHub.Api.Auth;
 using MovieHub.Api.Mapping;
 using MovieHub.Application.Infrastructure.Services;
 using MovieHub.Contracts.Requests;
+using MovieHub.Contracts.Requests.Rating;
 using MovieHub.Contracts.Responses;
+using MovieHub.Contracts.Responses.Rating;
 
 namespace MovieHub.Api.Controllers;
 

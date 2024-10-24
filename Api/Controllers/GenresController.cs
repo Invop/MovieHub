@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieHub.Api.Auth;
 using MovieHub.Application.Models;
+using MovieHub.Contracts.Requests.Genre;
+using MovieHub.Contracts.Responses.Genre;
 
 namespace MovieHub.Api.Controllers;
 

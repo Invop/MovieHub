@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Logging;
 using MovieHub.Api.Auth;
 using MovieHub.Application.Models;
+using MovieHub.Contracts.Requests.Movie;
+using MovieHub.Contracts.Responses.Movie;
 
 namespace MovieHub.Api.Controllers;
 

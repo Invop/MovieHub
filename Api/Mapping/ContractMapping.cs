@@ -2,7 +2,11 @@
 using MovieHub.Application.Infrastructure.Services;
 using MovieHub.Application.Models;
 using MovieHub.Contracts.Requests;
+using MovieHub.Contracts.Requests.Movie;
 using MovieHub.Contracts.Responses;
+using MovieHub.Contracts.Responses.Genre;
+using MovieHub.Contracts.Responses.Movie;
+using MovieHub.Contracts.Responses.Rating;
 
 namespace MovieHub.Api.Mapping;
 
