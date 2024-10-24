@@ -22,8 +22,12 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<IGenreService, GenreService>();
         services.AddScoped<IRatingRepository, RatingRepository>();
         services.AddScoped<IRatingService, RatingService>();
+        services.AddScoped<IActorRepository, ActorRepository>();
+        services.AddScoped<IActorService, ActorService>();
         services.AddScoped<IMovieRepository, MovieRepository>();
         services.AddScoped<IMovieService, MovieService>();
+        services.AddScoped<IUserListRepository, UserListRepository>();
+        services.AddScoped<IUserListService, UserListService>();
         services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
         return services;
     }
