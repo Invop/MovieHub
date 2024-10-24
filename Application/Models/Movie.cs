@@ -47,7 +47,7 @@ public partial class Movie
     // Navigation properties
     public ICollection<Genre> Genres { get; set; } = new List<Genre>();
     public ICollection<MovieRating> Ratings { get; set; } = new List<MovieRating>();
-
+    public ICollection<MovieActor> MovieActors { get; set; } = new List<MovieActor>();
     private string GenerateSlug()
     {
         var sluggedTitle = SlugRegex().Replace(Title, string.Empty)
