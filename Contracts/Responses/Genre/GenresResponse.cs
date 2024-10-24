@@ -1,4 +1,4 @@
-namespace MovieHub.Contracts.Responses;
+namespace MovieHub.Contracts.Responses.Genre;
 
 public class GenresResponse
 {

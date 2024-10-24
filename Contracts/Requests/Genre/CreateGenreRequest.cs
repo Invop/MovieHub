@@ -1,4 +1,4 @@
-namespace MovieHub.Contracts.Requests;
+namespace MovieHub.Contracts.Requests.Genre;
 
 public class CreateGenreRequest
 {
