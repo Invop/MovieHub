@@ -9,6 +9,10 @@ public class MovieValidator : AbstractValidator<Movie>
 {
     private readonly IGenreRepository _genreRepository;
     private readonly IMovieRepository _movieRepository;
+    private const int MinYear = 1888;
+    private const int MaxGenres = 5;
+    private const int MaxTitleLength = 200;
+    private const int MaxDescriptionLength = 2000;
 
     public MovieValidator(IMovieRepository movieRepository, IGenreRepository genreRepository)
     {
@@ -23,20 +27,34 @@ public class MovieValidator : AbstractValidator<Movie>
             .MustAsync(GenresMustExist)
             .WithMessage("Invalid genres");
 
-        RuleForEach(x => x.Genres)
-            .ChildRules(genres =>
-            {
-                genres.RuleFor(g => g.GenreLookup.Name)
-                    .NotEmpty()
-                    .WithMessage("Genre name is required and cannot be empty.");
-            }).WithMessage("Invalid genres");
+        RuleFor(x => x.Genres)
+            .NotEmpty()
+            .WithMessage("At least one genre is required.")
+            .Must(genres => genres.Count <= MaxGenres)
+            .WithMessage($"Movie cannot have more than {MaxGenres} genres.")
+            .MustAsync(GenresMustExist)
+            .WithMessage("One or more genres are invalid.");
         ;
 
+
         RuleFor(x => x.Title)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage("Movie title is required.")
+            .MinimumLength(1)
+            .WithMessage("Movie title must not be empty.")
+            .MaximumLength(MaxTitleLength)
+            .WithMessage($"Movie title must not exceed {MaxTitleLength} characters.")
+            .Must(BeValidTitle)
+            .WithMessage("Movie title can only contain letters, numbers, spaces, and basic punctuation (.,':-!)");
+
 
         RuleFor(x => x.YearOfRelease)
-            .LessThanOrEqualTo(DateTime.UtcNow.Year);
+            .NotEmpty()
+            .WithMessage("Release year is required.")
+            .GreaterThanOrEqualTo(MinYear)
+            .WithMessage($"Release year cannot be earlier than {MinYear}.")
+            .LessThanOrEqualTo(DateTime.UtcNow.Year + 5)
+            .WithMessage("Release year cannot be more than 5 years in the future.");
 
         RuleFor(x => x.Slug)
             .MustAsync(ValidateSlug)
@@ -46,6 +64,11 @@ public class MovieValidator : AbstractValidator<Movie>
             .Must(IsValidBase64)
             .WithMessage("Poster must be valid")
             .When(x => !string.IsNullOrEmpty(x.PosterBase64));
+        
+        RuleFor(x => x.Overview)
+            .MaximumLength(MaxDescriptionLength)
+            .WithMessage($"Description must not exceed {MaxDescriptionLength} characters.")
+            .When(x => !string.IsNullOrEmpty(x.Overview));
     }
 
     private async Task<bool> ValidateSlug(Movie movie, string slug, CancellationToken token = default)
@@ -71,5 +94,11 @@ public class MovieValidator : AbstractValidator<Movie>
         }
 
         return true;
+    }
+
+    private bool BeValidTitle(string title)
+    {
+        return !string.IsNullOrEmpty(title) &&
+               title.All(c => char.IsLetterOrDigit(c) || " .,':-!".Contains(c));
     }
 }
