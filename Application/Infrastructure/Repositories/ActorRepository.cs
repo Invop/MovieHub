@@ -14,6 +14,11 @@ public class ActorRepository : IActorRepository
         throw new NotImplementedException();
     }
 
+    public Task<Actor?> GetByNameAsync(string name, CancellationToken token = default)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<IEnumerable<Actor>> GetAllAsync(GetAllActorsOptions options, CancellationToken token = default)
     {
         throw new NotImplementedException();

@@ -11,6 +11,8 @@ namespace MovieHub.Application.Infrastructure.Repositories
 
         Task<Actor?> GetByIdAsync(Guid id, CancellationToken token = default);
 
+        Task<Actor?> GetByNameAsync(string name, CancellationToken token = default);
+        
         Task<IEnumerable<Actor>> GetAllAsync(GetAllActorsOptions options, CancellationToken token = default);
 
         Task<bool> UpdateAsync(Actor actor, CancellationToken token = default);
