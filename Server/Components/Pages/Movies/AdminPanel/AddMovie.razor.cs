@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using MovieHub.Contracts.Requests;
+using MovieHub.Contracts.Requests.Movie;
 using MovieHub.Contracts.Responses;
+using MovieHub.Contracts.Responses.Genre;
 using MovieHub.Services;
 using Radzen;
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MovieHub.Contracts.Requests;
+using MovieHub.Contracts.Requests.Genre;
 using MovieHub.Services;
 using Radzen;
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MovieHub.Components.Pages.ApplicationRoles;
 using MovieHub.Contracts.Responses;
+using MovieHub.Contracts.Responses.Genre;
 using MovieHub.Services;
 using Radzen;
 using Radzen.Blazor;

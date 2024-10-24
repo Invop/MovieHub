@@ -5,6 +5,12 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using MovieHub.Contracts.Requests.Genre;
+using MovieHub.Contracts.Requests.Movie;
+using MovieHub.Contracts.Requests.Rating;
+using MovieHub.Contracts.Responses.Genre;
+using MovieHub.Contracts.Responses.Movie;
+using MovieHub.Contracts.Responses.Rating;
 
 namespace MovieHub.Services
 {
