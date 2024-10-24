@@ -26,6 +26,8 @@ public class MovieRepository : IMovieRepository
         var movie = await _context.Movies
             .Include(m => m.Genres)
             .ThenInclude(g => g.GenreLookup)
+            .Include(m => m.MovieActors)
+            .ThenInclude(ma => ma.Actor)
             .Include(m => m.Ratings)
             .AsSplitQuery()
             .FirstOrDefaultAsync(m => m.Id == id, token);
@@ -44,6 +46,8 @@ public class MovieRepository : IMovieRepository
         var movie = await _context.Movies
             .Include(m => m.Genres)
             .ThenInclude(g => g.GenreLookup)
+            .Include(m => m.MovieActors)
+            .ThenInclude(ma => ma.Actor)
             .Include(m => m.Ratings)
             .AsSplitQuery()
             .FirstOrDefaultAsync(m => m.Slug == slug, token);
@@ -62,6 +66,8 @@ public class MovieRepository : IMovieRepository
         var query = _context.Movies
             .Include(m => m.Genres)
             .ThenInclude(g => g.GenreLookup)
+            .Include(m => m.MovieActors)
+            .ThenInclude(ma => ma.Actor)
             .Include(m => m.Ratings)
             .AsQueryable()
             .AsSplitQuery();
@@ -136,6 +142,7 @@ public class MovieRepository : IMovieRepository
         var existingMovie = await _context.Movies
             .Include(m => m.Genres)
             .ThenInclude(g => g.GenreLookup)
+            .Include(m => m.MovieActors)
             .FirstOrDefaultAsync(m => m.Id == movie.Id, token);
         if (existingMovie == null) return false;
 
